@@ -1568,7 +1568,19 @@ header h1 span {
             </div>
             <div class="field">
               <span class="label">Téléphone</span>
-              <span class="value" id="f_phone">---</span>
+              <span class="value" id="f_tel">---</span>
+            </div>
+            <div class="field">
+              <span class="label">Région</span>
+              <span class="value" id="f_region">---</span>
+            </div>
+            <div class="field">
+              <span class="label">Ville / Quartier</span>
+              <span class="value" id="f_localite">---</span>
+            </div>
+            <div class="field">
+              <span class="label">Disponible</span>
+              <span class="value highlight" id="f_available">---</span>
             </div>
             <div class="field">
               <span class="label">Création</span>
@@ -1949,7 +1961,11 @@ header h1 span {
     }
     setText('f_vehicle', vehicleText);
     setText('f_plate', data.vehiclePlate);
-    setText('f_phone', data.phone);
+    setText('f_tel', data.driverTel || data.phone || '');
+    setText('f_region', data.driverRegion || '');
+    var loc = (data.driverCommune || '') + (data.driverQuartier ? ' / ' + data.driverQuartier : '');
+    setText('f_localite', loc || '');
+    setText('f_available', data.driverAvailable !== false ? 'Oui' : 'Non');
     setText('f_creation', formatDate(data.creationDate));
     setText('f_validity', formatDate(data.validityDate));
 
@@ -2016,7 +2032,8 @@ header h1 span {
     var defaults = {
       'cardId': '#---', 'footerId': '---', 'f_fullName': '---',
       'f_licenseNumber': '---', 'f_licenseType': '---', 'f_vehicle': '---',
-      'f_plate': '---', 'f_phone': '---', 'f_creation': '---', 'f_validity': '---',
+      'f_plate': '---', 'f_tel': '---', 'f_region': '---', 'f_localite': '---', 'f_available': '---',
+      'f_creation': '---', 'f_validity': '---',
       'vCreatedValue': '--', 'vExpiresValue': '--', 'vStatusValue': '--', 'printDate': ''
     };
     Object.keys(defaults).forEach(function(id) {
@@ -2138,6 +2155,7 @@ header h1 span {
     }
     if (card && card.fullName) msg += '\n\uD83D\uDC64 Conducteur : ' + card.fullName;
     if (card && card.vehiclePlate) msg += '\n\uD83D\uDE9B V\u00e9hicule : ' + card.vehiclePlate;
+    if (card && (card.driverTel || card.phone)) msg += '\n\uD83D\uDCF1 T\u00e9l : ' + (card.driverTel || card.phone);
     var url = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(msg);
     window.open(url, '_blank', 'noopener');
   }
@@ -2624,7 +2642,11 @@ header h1 span {
       vehicleModel: 'Mercedes-Benz Actros',
       vehicleYear: '2022',
       vehiclePlate: 'AB-1234-CI',
-      phone: '+225 07 00 00 00 00',
+      driverTel: '+225 07 00 00 00 00',
+      driverRegion: 'Lagunes',
+      driverCommune: 'Abidjan',
+      driverQuartier: 'Plateau',
+      driverAvailable: true,
       creationDate: '2026-01-15',
       validityDate: '2029-01-15',
       parts: [
