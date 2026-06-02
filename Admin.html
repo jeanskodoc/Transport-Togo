@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#e65100">
+<meta name="description" content="ESODI Transport - Administration">
+<title>ESODI - Administration</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --primary: #e65100;
+  --primary-dark: #bf360c;
+  --primary-light: #ffcc80;
+  --success: #2e7d32;
+  --danger: #c62828;
+  --bg: #f0f2f5;
+  --card-bg: #fff;
+  --text: #222;
+  --text-muted: #666;
+  --border: #e0e0e0;
+  --shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #121212;
+    --card-bg: #1e1e1e;
+    --text: #e0e0e0;
+    --text-muted: #aaa;
+    --border: #333;
+  }
+}
+
+body {
+  background: var(--bg);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: env(safe-area-inset-top, 8px) env(safe-area-inset-right, 8px) env(safe-area-inset-bottom, 8px) env(safe-area-inset-left, 8px);
+  color: var(--text);
+}
+
+/* ====== LOGIN ====== */
+.login-overlay {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(135deg, #e65100 0%, #bf360c 100%);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.login-overlay.hidden { display: none; }
+
+.login-box {
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: clamp(28px, 6vw, 40px) clamp(20px, 4vw, 36px);
+  max-width: 380px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  animation: loginIn 0.4s ease-out;
+}
+
+@keyframes loginIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.login-box h1 {
+  text-align: center;
+  font-size: clamp(22px, 5vw, 28px);
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+
+.login-box .sub {
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+
+.login-box label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 4px;
+}
+
+.login-box input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 15px;
+  font-family: inherit;
+  background: #fafafa;
+  color: var(--text);
+  min-height: 48px;
+  margin-bottom: 14px;
+}
+
+.login-box input:focus { outline: none; border-color: var(--primary); background: #fff; }
+
+.login-box .btn-login {
+  width: 100%;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  min-height: 48px;
+  font-family: inherit;
+}
+
+.login-box .btn-login:hover { background: var(--primary-dark); }
+.login-box .btn-login:active { transform: scale(0.98); }
+
+.login-box .error-msg {
+  background: #ffebee;
+  color: var(--danger);
+  font-size: 13px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  display: none;
+  text-align: center;
+}
+
+.login-box .error-msg.visible { display: block; }
+
+/* ====== HEADER ====== */
+.container { max-width: 1100px; width: 100%; }
+
+header {
+  background: linear-gradient(135deg, #e65100 0%, #bf360c 100%);
+  color: #fff;
+  padding: clamp(14px, 3vw, 24px) clamp(14px, 3vw, 30px);
+  border-radius: 12px 12px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+header h1 {
+  font-size: clamp(16px, 3.5vw, 22px);
+  font-weight: 700;
+}
+
+header .admin-user {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+header button {
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  min-height: 40px;
+}
+
+header button:hover { background: rgba(255,255,255,0.25); }
+
+.main-content {
+  background: var(--card-bg);
+  border-radius: 0 0 12px 12px;
+  box-shadow: var(--shadow);
+  padding: clamp(14px, 3vw, 24px);
+}
+
+/* ====== STATS ====== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+@media (min-width: 640px) { .stats-grid { grid-template-columns: repeat(4, 1fr); } }
+
+.stat-card {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-radius: 10px;
+  padding: 14px 12px;
+  text-align: center;
+}
+
+.stat-card .stat-num {
+  font-size: clamp(20px, 4vw, 28px);
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.stat-card .stat-lbl {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-top: 4px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .stat-card { background: linear-gradient(135deg, #2a1a0a 0%, #3e2a10 100%); }
+}
+
+/* ====== SECTIONS ====== */
+.section {
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.section-title .badge {
+  font-size: 11px;
+  font-weight: 600;
+  background: #fff3e0;
+  color: var(--primary);
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+table th {
+  text-align: left;
+  padding: 10px 8px;
+  background: #fff3e0;
+  color: var(--primary-dark);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+
+table tr:hover td { background: #fafafa; }
+
+@media (prefers-color-scheme: dark) {
+  table th { background: #2a1a0a; }
+  table tr:hover td { background: #2a2a2a; }
+}
+
+.empty-msg {
+  text-align: center;
+  padding: 30px 16px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.btn-sm {
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: none;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  min-height: 28px;
+}
+
+.btn-sm.danger { background: #ffebee; color: var(--danger); }
+.btn-sm.success { background: #e8f5e9; color: var(--success); }
+
+/* ====== TOAST ====== */
+.toast-container {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2000;
+  width: 90%;
+  max-width: 420px;
+}
+
+.toast {
+  background: #323232;
+  color: #fff;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  animation: toastIn 0.25s ease-out;
+  margin-bottom: 8px;
+}
+
+.toast.success { background: #2e7d32; }
+.toast.error { background: #c62828; }
+.toast.info { background: #1565c0; }
+
+.toast.fadeout { animation: toastOut 0.3s ease-in forwards; }
+
+@keyframes toastIn { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes toastOut { to { transform: translateY(-20px); opacity: 0; } }
+</style>
+</head>
+<body>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- LOGIN -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <h1>ESODI</h1>
+    <div class="sub">Administration</div>
+    <div class="error-msg" id="loginError">Identifiant ou mot de passe incorrect</div>
+    <form id="loginForm">
+      <label for="loginUser">Identifiant</label>
+      <input type="text" id="loginUser" placeholder="Identifiant" required>
+      <label for="loginPass">Mot de passe</label>
+      <input type="password" id="loginPass" placeholder="Mot de passe" required>
+      <button type="submit" class="btn-login">Se connecter</button>
+    </form>
+  </div>
+</div>
+
+<div class="container" id="appContent" style="display:none;">
+  <header>
+    <div>
+      <h1>ESODI Administration</h1>
+      <div class="admin-user" id="adminInfo">Connecté en tant qu'administrateur</div>
+    </div>
+    <button id="btnLogout">Déconnexion</button>
+  </header>
+
+  <div class="main-content">
+
+    <!-- Stats -->
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card"><div class="stat-num" id="statDrivers">0</div><div class="stat-lbl">Conducteurs</div></div>
+      <div class="stat-card"><div class="stat-num" id="statBookings">0</div><div class="stat-lbl">Réservations</div></div>
+      <div class="stat-card"><div class="stat-num" id="statTrips">0</div><div class="stat-lbl">Trajets</div></div>
+      <div class="stat-card"><div class="stat-num" id="statRegions">0</div><div class="stat-lbl">Régions</div></div>
+    </div>
+
+    <!-- Bookings -->
+    <div class="section">
+      <div class="section-title">
+        Réservations clients
+        <span class="badge" id="bookingBadge">0</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Client</th><th>Tél</th><th>Date</th><th>Départ</th><th>Destination</th><th>Conducteur</th><th>Type</th></tr></thead>
+          <tbody id="bookingTable"><tr><td colspan="7" class="empty-msg">Aucune réservation enregistrée</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Drivers -->
+    <div class="section">
+      <div class="section-title">
+        Conducteurs
+        <span class="badge" id="driverBadge">0</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Nom</th><th>Téléphone</th><th>Région</th><th>Ville / Quartier</th><th>Véhicule</th><th>Disponible</th></tr></thead>
+          <tbody id="driverTable"><tr><td colspan="6" class="empty-msg">Aucun conducteur</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  var AUTH_KEY = 'esodi_admin_auth';
+  var AUTH_USER = 'KOLA';
+  var AUTH_PASS = 'KOLA1@';
+
+  // ====== STORAGE ======
+  function storageGet(key, fallback) {
+    try { var v = localStorage.getItem(key); return v !== null ? v : fallback; } catch(e) { return fallback; }
+  }
+  function storageSet(key, value) {
+    try { localStorage.setItem(key, value); return true; } catch(e) { return false; }
+  }
+  function storageGetJSON(key, fallback) {
+    try { var v = storageGet(key, null); return v ? JSON.parse(v) : fallback; } catch(e) { return fallback; }
+  }
+
+  // ====== TOAST ======
+  function toast(msg, type) {
+    type = type || 'info';
+    var c = document.getElementById('toastContainer');
+    var t = document.createElement('div');
+    t.className = 'toast ' + type;
+    t.textContent = msg;
+    c.appendChild(t);
+    setTimeout(function() {
+      t.classList.add('fadeout');
+      setTimeout(function() { if (t.parentNode) t.parentNode.removeChild(t); }, 300);
+    }, 3000);
+  }
+
+  // ====== AUTH ======
+  function isAuth() { return storageGet(AUTH_KEY, '') === 'yes'; }
+  function setAuth(v) { storageSet(AUTH_KEY, v ? 'yes' : ''); }
+
+  function showLogin() {
+    document.getElementById('loginOverlay').classList.remove('hidden');
+    document.getElementById('appContent').style.display = 'none';
+    document.getElementById('loginUser').focus();
+  }
+
+  function hideLogin() {
+    document.getElementById('loginOverlay').classList.add('hidden');
+    document.getElementById('appContent').style.display = '';
+  }
+
+  function attemptLogin(user, pass) {
+    if (user === AUTH_USER && pass === AUTH_PASS) {
+      setAuth(true);
+      hideLogin();
+      toast('Connexion réussie', 'success');
+      loadData();
+      return true;
+    }
+    var err = document.getElementById('loginError');
+    err.classList.add('visible');
+    document.getElementById('loginPass').value = '';
+    document.getElementById('loginPass').focus();
+    return false;
+  }
+
+  document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    attemptLogin(document.getElementById('loginUser').value.trim(), document.getElementById('loginPass').value);
+  });
+
+  document.getElementById('btnLogout').addEventListener('click', function() {
+    if (confirm('Déconnexion ?')) {
+      setAuth(false);
+      showLogin();
+      toast('Déconnecté', 'info');
+    }
+  });
+
+  // ====== DRIVERS DATA ======
+  var DRIVERS = [
+    { id:1, name:'ADAMBA Komlan', tel:'+228 90 01 02 03', region:'Maritime', commune:'Lomé', quartier:'Bè', vehicle:'Toyota Hiace', plate:'AB-001-TG', available:true },
+    { id:2, name:'DOSSEH Yawo', tel:'+228 90 11 22 33', region:'Maritime', commune:'Lomé', quartier:'Kodjoviakopé', vehicle:'Mercedes Sprinter', plate:'CD-002-TG', available:true },
+    { id:3, name:'KPOGO Kossi', tel:'+228 91 22 33 44', region:'Maritime', commune:'Lomé', quartier:'Tokoin', vehicle:'Renault Master', plate:'EF-003-TG', available:true },
+    { id:4, name:'AMOUZOU Mawulé', tel:'+228 92 33 44 55', region:'Maritime', commune:'Lomé', quartier:'Nyékonakpoè', vehicle:'Mercedes Actros', plate:'GH-004-TG', available:true },
+    { id:5, name:'SESIME Kodjo', tel:'+228 93 44 55 66', region:'Maritime', commune:'Lomé', quartier:'Adidogomé', vehicle:'Isuzu NQR', plate:'IJ-005-TG', available:true },
+    { id:6, name:'AGBOKOU Yao', tel:'+228 90 55 66 77', region:'Maritime', commune:'Lomé', quartier:'Amoutivé', vehicle:'Toyota Hiace', plate:'KL-006-TG', available:true },
+    { id:7, name:'TEVI Koffi', tel:'+228 91 66 77 88', region:'Maritime', commune:'Lomé', quartier:'Hédzranawoé', vehicle:'Mercedes Sprinter', plate:'MN-007-TG', available:false },
+    { id:8, name:'KOUSSI Komi', tel:'+228 92 77 88 99', region:'Maritime', commune:'Lomé', quartier:'Agoè', vehicle:'Renault Master', plate:'OP-008-TG', available:true },
+    { id:9, name:'GBETO Messan', tel:'+228 93 88 99 00', region:'Maritime', commune:'Tsévié', quartier:'Tsévié Centre', vehicle:'Isuzu NQR', plate:'QR-009-TG', available:true },
+    { id:10, name:'AKAKPO Yaovi', tel:'+228 90 99 00 11', region:'Maritime', commune:'Aného', quartier:'Glidji', vehicle:'Toyota Hiace', plate:'ST-010-TG', available:true },
+    { id:11, name:'ATCHALI Aboudou', tel:'+228 91 12 13 14', region:'Plateaux', commune:'Atakpamé', quartier:'Atakpamé Ville', vehicle:'Mercedes Actros', plate:'UV-011-TG', available:true },
+    { id:12, name:'BALOUKI Amana', tel:'+228 92 13 14 15', region:'Plateaux', commune:'Kpalimé', quartier:'Kpalimé Centre', vehicle:'Toyota Hiace', plate:'WX-012-TG', available:true },
+    { id:13, name:'MALOU Kwami', tel:'+228 93 14 15 16', region:'Plateaux', commune:'Notsé', quartier:'Notsé Ville', vehicle:'Isuzu NQR', plate:'YZ-013-TG', available:true },
+    { id:14, name:'KAYA Eyadéma', tel:'+228 90 15 16 17', region:'Plateaux', commune:'Badou', quartier:'Badou Centre', vehicle:'Renault Master', plate:'AA-014-TG', available:true },
+    { id:15, name:'BASSALI Tchaa', tel:'+228 91 16 17 18', region:'Centrale', commune:'Sokodé', quartier:'Sokodé Ville', vehicle:'Mercedes Actros', plate:'BB-015-TG', available:true },
+    { id:16, name:'ASSIMA Moustafa', tel:'+228 92 17 18 19', region:'Centrale', commune:'Tchamba', quartier:'Tchamba Centre', vehicle:'Toyota Hiace', plate:'CC-016-TG', available:true },
+    { id:17, name:'BONTI Biova', tel:'+228 93 18 19 20', region:'Centrale', commune:'Sotouboua', quartier:'Sotouboua Ville', vehicle:'Isuzu NQR', plate:'DD-017-TG', available:false },
+    { id:18, name:'TCHAOU Tiemon', tel:'+228 90 19 20 21', region:'Kara', commune:'Kara', quartier:'Kara Centre', vehicle:'Mercedes Sprinter', plate:'EE-018-TG', available:true },
+    { id:19, name:'PIOGNAN Kpatcha', tel:'+228 91 20 21 22', region:'Kara', commune:'Niamtougou', quartier:'Niamtougou Ville', vehicle:'Renault Master', plate:'FF-019-TG', available:true },
+    { id:20, name:'DOUKO Pezi', tel:'+228 92 21 22 23', region:'Kara', commune:'Pagouda', quartier:'Pagouda Centre', vehicle:'Toyota Hiace', plate:'GG-020-TG', available:true },
+    { id:21, name:'TCHASSANTI Nagou', tel:'+228 93 22 23 24', region:'Savanes', commune:'Dapaong', quartier:'Dapaong Ville', vehicle:'Isuzu NQR', plate:'HH-021-TG', available:true },
+    { id:22, name:'DJIBO Mouftaou', tel:'+228 90 23 24 25', region:'Savanes', commune:'Mango', quartier:'Mango Centre', vehicle:'Mercedes Actros', plate:'II-022-TG', available:true },
+    { id:23, name:'SABO Mani', tel:'+228 91 24 25 26', region:'Savanes', commune:'Tône', quartier:'Tône Centre', vehicle:'Toyota Hiace', plate:'JJ-023-TG', available:false },
+    { id:24, name:'KPATWA Assiongbon', tel:'+228 92 25 26 27', region:'Maritime', commune:'Tabligbo', quartier:'Tabligbo Ville', vehicle:'Mercedes Sprinter', plate:'KK-024-TG', available:true },
+    { id:25, name:'ADANY Mawuko', tel:'+228 93 25 26 27', region:'Maritime', commune:'Lomé', quartier:'Doumasséssé', vehicle:'Toyota Hiace', plate:'LL-025-TG', available:true }
+  ];
+
+  // ====== LOAD DATA ======
+  function loadData() {
+    // Statistics
+    var regions = {};
+    DRIVERS.forEach(function(d) { regions[d.region] = true; });
+    document.getElementById('statDrivers').textContent = DRIVERS.length;
+    document.getElementById('statRegions').textContent = Object.keys(regions).length;
+
+    // Bookings from localStorage (saved by Client.html)
+    var bookings = storageGetJSON('esodi_bookings', []);
+    document.getElementById('statBookings').textContent = bookings.length;
+    document.getElementById('bookingBadge').textContent = bookings.length;
+
+    var bTable = document.getElementById('bookingTable');
+    bTable.innerHTML = '';
+    if (!bookings.length) {
+      bTable.innerHTML = '<tr><td colspan="7" class="empty-msg">Aucune réservation enregistrée</td></tr>';
+    } else {
+      bookings.slice().reverse().forEach(function(b) {
+        var tr = document.createElement('tr');
+        var typeLabels = { course:'Course', location:'Location', colis:'Colis', transfert:'Transfert', autre:'Autre' };
+        tr.innerHTML = '<td>' + esc(b.name) + '</td><td>' + esc(b.tel) + '</td><td>' + esc(b.date) + '</td><td>' + esc(b.from) + '</td><td>' + esc(b.to) + '</td><td>' + esc(b.driver) + '</td><td>' + esc(typeLabels[b.type] || b.type) + '</td>';
+        bTable.appendChild(tr);
+      });
+    }
+
+    // Trips from localStorage
+    var trips = storageGetJSON('esodi_trips', []);
+    document.getElementById('statTrips').textContent = trips.length;
+
+    // Drivers table
+    document.getElementById('driverBadge').textContent = DRIVERS.length;
+    var dTable = document.getElementById('driverTable');
+    dTable.innerHTML = '';
+    DRIVERS.forEach(function(d) {
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + esc(d.name) + '</td><td>' + esc(d.tel) + '</td><td>' + esc(d.region) + '</td><td>' + esc(d.commune + (d.quartier ? ' / ' + d.quartier : '')) + '</td><td>' + esc(d.vehicle + ' (' + d.plate + ')') + '</td><td>' + (d.available ? '<span style="color:#2e7d32;font-weight:600;">Disponible</span>' : '<span style="color:#c62828;font-weight:600;">Indisponible</span>') + '</td>';
+      dTable.appendChild(tr);
+    });
+  }
+
+  function esc(s) {
+    if (s === undefined || s === null) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ====== INIT ======
+  if (isAuth()) {
+    hideLogin();
+    loadData();
+  } else {
+    showLogin();
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,2676 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1a237e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="description" content="Carte Digitale Conducteur - ESODI Transport & Logistique">
+<title>Carte Digitale Conducteur - ESODI</title>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --primary: #1a237e;
+  --primary-dark: #0d47a1;
+  --primary-light: #5c6bc0;
+  --success: #2e7d32;
+  --warning: #e65100;
+  --danger: #c62828;
+  --bg: #f0f2f5;
+  --card-bg: #fff;
+  --text: #222;
+  --text-muted: #666;
+  --border: #e0e0e0;
+  --shadow: 0 8px 30px rgba(0,0,0,0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #121212;
+    --card-bg: #1e1e1e;
+    --text: #e0e0e0;
+    --text-muted: #aaa;
+    --border: #333;
+    --shadow: 0 8px 30px rgba(0,0,0,0.4);
+  }
+}
+
+body {
+  background: var(--bg);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: env(safe-area-inset-top, 10px) env(safe-area-inset-right, 10px) env(safe-area-inset-bottom, 10px) env(safe-area-inset-left, 10px);
+  color: var(--text);
+}
+
+/* === LOGIN SCREEN === */
+.login-overlay {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(135deg, #1a237e 0%, #0d47a1 50%, #1565c0 100%);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.login-overlay.hidden { display: none; }
+
+.login-box {
+  background: #fff;
+  border-radius: 16px;
+  padding: clamp(28px, 6vw, 40px) clamp(20px, 4vw, 36px);
+  max-width: 380px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  animation: loginIn 0.4s ease-out;
+}
+
+@keyframes loginIn {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.login-box .logo {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.login-box .logo h1 {
+  font-size: clamp(22px, 5vw, 28px);
+  font-weight: 800;
+  color: #1a237e;
+  letter-spacing: 0.5px;
+}
+
+.login-box .logo p {
+  font-size: 13px;
+  color: #888;
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.login-box .form-row {
+  margin-bottom: 16px;
+}
+
+.login-box label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 4px;
+}
+
+.login-box input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 15px;
+  font-family: inherit;
+  background: #fafafa;
+  transition: border 0.2s;
+  min-height: 48px;
+  color: #222;
+}
+
+.login-box input:focus {
+  outline: none;
+  border-color: #1a237e;
+  background: #fff;
+}
+
+.login-box .btn-login {
+  width: 100%;
+  background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+  color: #fff;
+  border: none;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  min-height: 48px;
+  margin-top: 8px;
+  transition: background 0.2s, transform 0.1s;
+  font-family: inherit;
+}
+
+.login-box .btn-login:hover { background: linear-gradient(135deg, #0d47a1 0%, #1565c0 100%); }
+.login-box .btn-login:active { transform: scale(0.98); }
+.login-box .btn-login.loading { opacity: 0.7; pointer-events: none; }
+
+.login-box .error-msg {
+  background: #ffebee;
+  color: #c62828;
+  font-size: 13px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  display: none;
+  text-align: center;
+}
+
+.login-box .error-msg.visible { display: block; }
+
+.login-box .hint {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 11px;
+  color: #aaa;
+}
+
+@media (prefers-color-scheme: dark) {
+  .login-box { background: #1e1e1e; }
+  .login-box .logo h1 { color: #5c6bc0; }
+  .login-box .logo p { color: #888; }
+  .login-box label { color: #aaa; }
+  .login-box input { background: #2a2a2a; border-color: #444; color: #e0e0e0; }
+  .login-box input:focus { border-color: #5c6bc0; background: #333; }
+  .login-box .error-msg { background: #3e1515; }
+  .login-box .hint { color: #555; }
+}
+
+.container {
+  max-width: 900px;
+  width: 100%;
+}
+
+header {
+  background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+  color: #fff;
+  padding: clamp(12px, 3vw, 24px) clamp(14px, 3vw, 30px);
+  border-radius: 12px 12px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+header h1 {
+  font-size: clamp(15px, 3.5vw, 22px);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: clamp(4px, 1.5vw, 10px);
+}
+
+header h1 span {
+  font-weight: 300;
+  font-size: clamp(11px, 2.5vw, 16px);
+  opacity: 0.8;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.controls label, .controls button {
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  padding: clamp(10px, 2vw, 12px) clamp(12px, 2.5vw, 18px);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: clamp(12px, 2.2vw, 14px);
+  transition: background 0.2s, transform 0.1s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+  border: none;
+  font-family: inherit;
+  line-height: 1;
+}
+
+.controls button:active,
+.controls button:hover,
+.controls label:active,
+.controls label:hover {
+  background: rgba(255,255,255,0.25);
+}
+
+.controls button:active,
+.controls label:active {
+  transform: scale(0.96);
+}
+
+.controls input[type="file"] { display: none; }
+
+.controls button[disabled],
+.controls label[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+#btnLogout {
+  background: rgba(198,40,40,0.2);
+}
+#btnLogout:hover { background: rgba(198,40,40,0.35); }
+#btnLogout:active { background: rgba(198,40,40,0.5); }
+
+/* === TOAST === */
+.toast-container {
+  position: fixed;
+  top: env(safe-area-inset-top, 16px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+  width: 90%;
+  max-width: 420px;
+}
+
+.toast {
+  background: #323232;
+  color: #fff;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: toastIn 0.25s ease-out;
+  pointer-events: auto;
+}
+
+.toast.success { background: #2e7d32; }
+.toast.error { background: #c62828; }
+.toast.warning { background: #e65100; }
+.toast.info { background: #1565c0; }
+
+.toast.fadeout { animation: toastOut 0.3s ease-in forwards; }
+
+@keyframes toastIn {
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes toastOut {
+  to { transform: translateY(-20px); opacity: 0; }
+}
+
+/* === MODAL === */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  justify-content: center;
+  align-items: flex-end;
+  padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
+}
+
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--card-bg);
+  width: 100%;
+  max-width: 560px;
+  max-height: 92vh;
+  border-radius: 20px 20px 0 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideUp 0.25s ease-out;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: clamp(14px, 3vw, 20px) clamp(14px, 3vw, 20px) 10px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.modal-header h2 {
+  font-size: clamp(16px, 3vw, 18px);
+  color: var(--primary);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #999;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-body {
+  padding: clamp(12px, 2.5vw, 20px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  flex: 1;
+}
+
+/* Trip form */
+.trip-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+
+.trip-form .form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.trip-form label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.trip-form input, .trip-form textarea, .trip-form select {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  background: #fafafa;
+  color: var(--text);
+  transition: border 0.2s;
+  min-height: 44px;
+  width: 100%;
+}
+
+.trip-form input:focus, .trip-form textarea:focus, .trip-form select:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: #fff;
+}
+
+.trip-form textarea {
+  min-height: 60px;
+  resize: vertical;
+}
+
+.trip-form .form-inline {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.trip-form input[readonly] {
+  background: #f0f0f0;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.btn-gps {
+  background: var(--success);
+  color: #fff;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 44px;
+  transition: background 0.2s, transform 0.1s, opacity 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: inherit;
+}
+
+.btn-gps:hover { background: #1b5e20; }
+.btn-gps:active { transform: scale(0.97); }
+.btn-gps.loading { background: #558b2f; opacity: 0.7; }
+.btn-gps .gps-pulse {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #fff;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.3); }
+}
+
+.gps-coords {
+  font-size: 11px;
+  color: #888;
+  text-align: center;
+  padding: 4px;
+  background: #f5f5f5;
+  border-radius: 6px;
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: ui-monospace, 'SF Mono', Consolas, monospace;
+}
+
+.gps-coords.success { color: var(--success); background: #e8f5e9; }
+
+.cost-display {
+  background: #e8eaf6;
+  border-radius: 8px;
+  padding: 10px 14px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.cost-display .cost-label {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.btn-submit {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 48px;
+  margin-top: 4px;
+  transition: background 0.2s, transform 0.1s;
+  font-family: inherit;
+}
+
+.btn-submit:hover { background: var(--primary-dark); }
+.btn-submit:active {
+  background: var(--primary-dark);
+  transform: scale(0.98);
+}
+
+/* === STATS === */
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.stat-item {
+  background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%);
+  border-radius: 10px;
+  padding: 10px 8px;
+  text-align: center;
+}
+
+.stat-item .stat-icon {
+  font-size: 16px;
+  margin-bottom: 2px;
+  display: block;
+}
+
+.stat-item .stat-value {
+  font-size: clamp(14px, 3vw, 18px);
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1.1;
+}
+
+.stat-item .stat-label {
+  font-size: clamp(9px, 1.8vw, 11px);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-top: 2px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .stat-item { background: linear-gradient(135deg, #1a1a3e 0%, #2a2a55 100%); }
+  .stat-item .stat-value { color: var(--primary-light); }
+}
+
+/* === MAP === */
+.map-section {
+  margin-bottom: 16px;
+}
+
+.map-section h4 {
+  font-size: 13px;
+  color: var(--primary);
+  margin-bottom: 6px;
+}
+
+#tripMap {
+  width: 100%;
+  height: 220px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  position: relative;
+  background: #f5f5f5;
+}
+
+#tripMap iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+.map-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background: #f5f5f5;
+  color: #999;
+  font-size: 13px;
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+}
+
+.btn-open-maps {
+  display: block;
+  width: 100%;
+  background: var(--danger);
+  color: #fff;
+  border: none;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 48px;
+  margin-top: 8px;
+  transition: background 0.2s, transform 0.1s;
+  font-family: inherit;
+  text-align: center;
+}
+
+.btn-open-maps:hover { background: #b71c1c; }
+.btn-open-maps:active { background: #b71c1c; transform: scale(0.98); }
+
+/* Trip list */
+.trip-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.trip-list-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.trip-count {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.trip-search {
+  flex: 1;
+  min-width: 120px;
+  max-width: 200px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 12px;
+  font-family: inherit;
+  background: #fafafa;
+  color: var(--text);
+  min-height: 32px;
+}
+
+.trip-search:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.trip-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.trip-empty {
+  text-align: center;
+  padding: 30px 16px;
+  color: #999;
+  font-size: 13px;
+}
+
+.trip-card {
+  background: #f9f9f9;
+  border-radius: 10px;
+  padding: 12px 14px;
+  border-left: 4px solid var(--primary);
+  position: relative;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.trip-card:hover { background: #f0f0f0; }
+.trip-card:active { transform: scale(0.99); }
+
+.trip-card .trip-date {
+  font-size: 11px;
+  color: #888;
+  font-weight: 500;
+  padding-right: 30px;
+}
+
+.trip-card .trip-route {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.trip-card .trip-route .arrow {
+  color: var(--primary);
+  font-size: 16px;
+}
+
+.trip-card .trip-details {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+.trip-card .trip-details span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.trip-card .trip-cost {
+  display: inline-block;
+  background: #e8eaf6;
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.trip-card .trip-purpose {
+  font-size: 12px;
+  color: #555;
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px dashed var(--border);
+}
+
+.trip-actions {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  gap: 2px;
+}
+
+.trip-action-btn {
+  background: none;
+  border: none;
+  color: #ccc;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 6px;
+  line-height: 1;
+  transition: color 0.2s;
+  min-width: 32px;
+  min-height: 32px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.trip-action-btn:hover { color: var(--primary); background: rgba(26,35,126,0.08); }
+.trip-action-btn.delete:hover { color: var(--danger); background: rgba(198,40,40,0.08); }
+
+/* Confirm dialog */
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 1500;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.confirm-overlay.open { display: flex; }
+
+.confirm-box {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 360px;
+  width: 100%;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+  animation: confirmIn 0.2s ease-out;
+}
+
+@keyframes confirmIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.confirm-box h3 {
+  color: var(--primary);
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.confirm-box p {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.confirm-btn {
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  min-height: 40px;
+  min-width: 80px;
+}
+
+.confirm-btn.cancel { background: #eee; color: #333; }
+.confirm-btn.cancel:hover { background: #ddd; }
+.confirm-btn.danger { background: var(--danger); color: #fff; }
+.confirm-btn.danger:hover { background: #b71c1c; }
+.confirm-btn.primary { background: var(--primary); color: #fff; }
+.confirm-btn.primary:hover { background: var(--primary-dark); }
+
+/* Modal responsive */
+@media (max-width: 520px) {
+  .modal { max-height: 92vh; border-radius: 16px 16px 0 0; }
+  .trip-form .form-inline { grid-template-columns: 1fr; }
+  .modal-body { padding: 12px; }
+  #tripMap { height: 180px; }
+  .stats-bar { grid-template-columns: repeat(3, 1fr); gap: 4px; }
+  .stat-item { padding: 8px 4px; }
+  .stat-item .stat-value { font-size: 13px; }
+  .stat-item .stat-label { font-size: 9px; }
+}
+
+@media (prefers-color-scheme: dark) {
+  .modal { background: #1e1e1e; }
+  .modal-header { border-bottom-color: #333; }
+  .modal-header h2 { color: #7986cb; }
+  .modal-close { color: #666; }
+  .trip-form { border-bottom-color: #333; }
+  .trip-form label { color: #aaa; }
+  .trip-form input, .trip-form textarea, .trip-form select { background: #2a2a2a; border-color: #444; color: #e0e0e0; }
+  .trip-form input:focus, .trip-form textarea:focus, .trip-form select:focus { border-color: #7986cb; background: #333; }
+  .trip-form input[readonly] { background: #333; color: #7986cb; }
+  .gps-coords { background: #2a2a2a; color: #aaa; }
+  .gps-coords.success { color: #66bb6a; background: #1b3a1c; }
+  .cost-display { background: #1a1a3e; color: #7986cb; }
+  .cost-display .cost-label { color: #888; }
+  .btn-gps { background: #388e3c; }
+  .btn-gps:hover { background: #2e7d32; }
+  .trip-card { background: #2a2a2a; }
+  .trip-card:hover { background: #333; }
+  .trip-card .trip-route { color: #e0e0e0; }
+  .trip-card .trip-purpose { border-top-color: #333; color: #aaa; }
+  .trip-card .trip-cost { background: #1a1a3e; color: #7986cb; }
+  .trip-empty { color: #666; }
+  .trip-card .trip-details { color: #aaa; }
+  .trip-card .trip-date { color: #888; }
+  .map-section h4 { color: #7986cb; }
+  #tripMap { border-color: #444; }
+  .map-placeholder { background: #2a2a2a; color: #666; }
+  .btn-open-maps { background: #b71c1c; }
+  .trip-search { background: #2a2a2a; border-color: #444; color: #e0e0e0; }
+  .confirm-box { background: #1e1e1e; }
+  .confirm-box h3 { color: #7986cb; }
+  .confirm-box p { color: #aaa; }
+  .confirm-btn.cancel { background: #333; color: #e0e0e0; }
+  .confirm-btn.cancel:hover { background: #444; }
+}
+
+.card-wrapper {
+  background: var(--card-bg);
+  border-radius: 0 0 12px 12px;
+  box-shadow: var(--shadow);
+  padding: clamp(16px, 4vw, 30px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.empty-state {
+  text-align: center;
+  padding: clamp(40px, 10vw, 80px) 16px;
+  color: #999;
+}
+
+.empty-state .icon {
+  font-size: clamp(40px, 10vw, 56px);
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+.empty-state h2 {
+  font-size: clamp(17px, 3.5vw, 20px);
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.empty-state p {
+  font-size: clamp(13px, 2.5vw, 14px);
+  color: #aaa;
+}
+
+.empty-state .empty-actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.empty-state .empty-btn {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  text-decoration: none;
+}
+
+.empty-state .empty-btn:hover { background: var(--primary-dark); }
+.empty-state .empty-btn.secondary { background: #e8eaf6; color: var(--primary); }
+.empty-state .empty-btn.secondary:hover { background: #c5cae9; }
+
+/* === CARD === */
+.card {
+  width: min(520px, 100%);
+  min-height: 280px;
+  background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+  border-radius: 14px;
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.12),
+    0 0 0 1px rgba(0,0,0,0.06);
+  position: relative;
+  overflow: hidden;
+  display: none;
+  flex-direction: column;
+}
+
+.card.visible { display: flex; }
+
+.card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: clamp(6px, 1.2vw, 8px);
+  background: linear-gradient(180deg, #1a237e 0%, #0d47a1 50%, #1565c0 100%);
+}
+
+.card-inner {
+  padding: clamp(14px, 3vw, 20px) clamp(14px, 3.5vw, 24px) clamp(14px, 3vw, 20px) clamp(20px, 4vw, 28px);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: clamp(8px, 1.5vw, 12px);
+  border-bottom: 2px solid var(--primary);
+}
+
+.card-brand .name {
+  font-size: clamp(16px, 3.5vw, 20px);
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: 0.5px;
+  line-height: 1.1;
+}
+
+.card-brand .sub {
+  font-size: clamp(7px, 1.5vw, 9px);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+
+.card-brand .title {
+  font-size: clamp(9px, 1.8vw, 11px);
+  color: var(--primary-dark);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-top: 2px;
+}
+
+.card-id-badge {
+  background: var(--primary);
+  color: #fff;
+  font-size: clamp(10px, 1.8vw, 11px);
+  font-weight: 700;
+  padding: 3px clamp(8px, 1.8vw, 12px);
+  border-radius: 20px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.card-body {
+  display: flex;
+  gap: clamp(12px, 2.5vw, 18px);
+  padding-top: clamp(10px, 2vw, 14px);
+  flex: 1;
+}
+
+.card-photo {
+  width: clamp(90px, 20vw, 120px);
+  min-height: clamp(110px, 25vw, 145px);
+  flex-shrink: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #e0e0e0;
+  border: 1px solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+}
+
+.card-photo:hover::after {
+  content: 'Changer';
+  position: absolute;
+  inset: 0;
+  background: rgba(26,35,126,0.8);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.card-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.card-photo .placeholder {
+  font-size: clamp(9px, 1.8vw, 11px);
+  color: #999;
+  text-align: center;
+  padding: 8px;
+}
+
+.card-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(3px, 0.8vw, 5px);
+}
+
+.card-info .field {
+  display: flex;
+  font-size: clamp(11px, 2vw, 12px);
+  line-height: 1.3;
+  flex-wrap: wrap;
+}
+
+.card-info .field .label {
+  width: clamp(70px, 16vw, 95px);
+  flex-shrink: 0;
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: clamp(9px, 1.6vw, 10px);
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+}
+
+.card-info .field .value {
+  color: var(--text);
+  font-weight: 600;
+  font-size: clamp(11px, 2vw, 12px);
+  word-break: break-word;
+}
+
+.card-info .field .value.highlight {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.card-footer {
+  margin-top: auto;
+  padding-top: clamp(6px, 1.2vw, 10px);
+  border-top: 1px dashed var(--border);
+  display: flex;
+  justify-content: space-between;
+  font-size: clamp(7px, 1.4vw, 9px);
+  color: #888;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* === DOCUMENTS SECTION === */
+.documents-section {
+  width: 100%;
+  max-width: 520px;
+  margin-top: clamp(16px, 4vw, 24px);
+  display: none;
+}
+
+.documents-section.visible { display: block; }
+
+.documents-section h3 {
+  font-size: clamp(13px, 2.5vw, 14px);
+  color: var(--primary);
+  margin-bottom: clamp(6px, 1.5vw, 10px);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.docs-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4px;
+}
+
+.doc-item {
+  display: flex;
+  align-items: center;
+  gap: clamp(5px, 1.2vw, 7px);
+  font-size: clamp(11px, 2vw, 12px);
+  padding: clamp(6px, 1.2vw, 8px) clamp(6px, 1.5vw, 8px);
+  border-radius: 6px;
+  background: #f9f9f9;
+  min-height: 36px;
+}
+
+.doc-item .dot {
+  width: clamp(7px, 1.5vw, 8px);
+  height: clamp(7px, 1.5vw, 8px);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.doc-item .dot.checked { background: var(--success); }
+.doc-item .dot.unchecked { background: #bdbdbd; }
+.doc-item .dot.required { background: var(--warning); }
+
+.doc-item .doc-label {
+  color: #444;
+  flex: 1;
+  line-height: 1.3;
+}
+
+.doc-item .doc-badge {
+  font-size: clamp(8px, 1.5vw, 9px);
+  padding: 2px clamp(4px, 1vw, 6px);
+  border-radius: 4px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.doc-item .doc-badge.obligatoire {
+  background: #fff3e0;
+  color: var(--warning);
+}
+
+.doc-item .doc-badge.optionnel {
+  background: #e8eaf6;
+  color: #3949ab;
+}
+
+/* === VALIDITY BAR === */
+.validity-bar {
+  margin-top: clamp(10px, 2.5vw, 12px);
+  max-width: 520px;
+  width: 100%;
+  display: none;
+  gap: 6px;
+}
+
+.validity-bar.visible { display: flex; }
+
+.validity-item {
+  flex: 1;
+  text-align: center;
+  padding: clamp(6px, 1.5vw, 8px) 4px;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.validity-item .v-label {
+  font-size: clamp(7px, 1.5vw, 9px);
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.validity-item .v-value {
+  font-size: clamp(11px, 2.2vw, 13px);
+  font-weight: 600;
+  color: #333;
+  margin-top: 2px;
+}
+
+.validity-item.expired .v-value { color: var(--danger); }
+.validity-item.valid .v-value { color: var(--success); }
+
+/* === NOTES === */
+.notes-area {
+  max-width: 520px;
+  width: 100%;
+  margin-top: 8px;
+  display: none;
+}
+
+.notes-area.visible { display: block; }
+
+.notes-area .notes-box {
+  background: #fff8e1;
+  border: 1px solid #ffe082;
+  border-radius: 8px;
+  padding: clamp(6px, 1.5vw, 10px) clamp(8px, 2vw, 12px);
+  font-size: clamp(11px, 2vw, 12px);
+  color: #6d4c00;
+  line-height: 1.4;
+}
+
+.notes-area .notes-box strong {
+  font-size: clamp(9px, 1.6vw, 10px);
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 520px) {
+  body { padding: 8px; }
+
+  header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    border-radius: 10px 10px 0 0;
+  }
+
+  header h1 {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .controls {
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .controls label, .controls button {
+    flex: 1;
+    justify-content: center;
+    min-height: 48px;
+    font-size: 13px;
+    padding: 10px 8px;
+  }
+
+  .card-wrapper {
+    padding: 12px 10px;
+    border-radius: 0 0 10px 10px;
+  }
+
+  .card { border-radius: 10px; }
+
+  .card::before { width: 5px; }
+
+  .card-inner {
+    padding: 12px 10px 12px 16px;
+  }
+
+  .card-body {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .card-photo {
+    width: 100px;
+    min-height: 120px;
+    align-self: center;
+  }
+
+  .card-info {
+    width: 100%;
+  }
+
+  .card-info .field {
+    flex-wrap: nowrap;
+  }
+
+  .card-info .field .label {
+    width: 80px;
+    font-size: 9px;
+  }
+
+  .card-info .field .value {
+    font-size: 11px;
+  }
+
+  .card-footer {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 2px;
+  }
+
+  .validity-bar {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .validity-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    text-align: left;
+  }
+
+  .validity-item .v-label {
+    font-size: 10px;
+  }
+
+  .validity-item .v-value {
+    font-size: 13px;
+    margin-top: 0;
+  }
+
+  .documents-section h3 {
+    font-size: 13px;
+  }
+
+  .doc-item {
+    min-height: 40px;
+    font-size: 12px;
+  }
+
+  .empty-state {
+    padding: 40px 16px;
+  }
+
+  .empty-state .icon {
+    font-size: 40px;
+  }
+}
+
+@media (max-width: 380px) {
+  body { padding: 4px; }
+
+  .card-wrapper { padding: 8px 6px; }
+
+  .card-inner { padding: 10px 8px 10px 14px; }
+  .card::before { width: 4px; }
+
+  .card-photo {
+    width: 80px;
+    min-height: 100px;
+  }
+
+  .card-info .field .label { width: 65px; font-size: 8px; }
+  .card-info .field .value { font-size: 10px; }
+
+  .controls label, .controls button {
+    font-size: 12px;
+    padding: 8px 6px;
+    min-height: 44px;
+  }
+
+  .card-brand .name { font-size: 15px; }
+  .card-id-badge { font-size: 9px; padding: 2px 6px; }
+
+  .doc-item { font-size: 11px; min-height: 36px; }
+  .doc-item .doc-badge { font-size: 8px; }
+
+  .validity-item { padding: 6px 10px; }
+  .validity-item .v-label { font-size: 9px; }
+  .validity-item .v-value { font-size: 12px; }
+
+  .stat-item .stat-value { font-size: 12px; }
+  .stat-item .stat-label { font-size: 8px; }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .card { width: 500px; }
+  .card-photo { width: 110px; min-height: 135px; }
+  .docs-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (min-width: 1025px) {
+  .docs-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (prefers-color-scheme: dark) {
+  body { background: #121212; }
+  .card-wrapper { background: #1e1e1e; }
+  .card { background: linear-gradient(135deg, #2a2a2a 0%, #252525 100%); }
+  .card-brand .name { color: #5c6bc0; }
+  .card-brand .sub { color: #aaa; }
+  .card-brand .title { color: #7986cb; }
+  .card-id-badge { background: #5c6bc0; }
+  .card-info .field .value { color: #e0e0e0; }
+  .card-info .field .value.highlight { color: #7986cb; }
+  .card-info .field .label { color: #999; }
+  .card-footer { color: #888; border-top-color: #333; }
+  .card-header { border-bottom-color: #5c6bc0; }
+  .card::before { background: linear-gradient(180deg, #3949ab 0%, #5c6bc0 100%); }
+  .card-photo { background: #333; border-color: #444; }
+  .card-photo .placeholder { color: #666; }
+  .validity-item { background: #2a2a2a; }
+  .validity-item .v-label { color: #aaa; }
+  .validity-item .v-value { color: #ccc; }
+  .doc-item { background: #2a2a2a; }
+  .doc-item .doc-label { color: #ccc; }
+  .notes-area .notes-box { background: #3e3500; border-color: #665500; color: #ffd54f; }
+  .empty-state h2 { color: #aaa; }
+  .empty-state p { color: #666; }
+  .doc-item .doc-badge.obligatoire { background: #3e2700; }
+  .doc-item .doc-badge.optionnel { background: #1a1a3e; color: #7986cb; }
+  .empty-state .empty-btn.secondary { background: #2a2a55; color: #7986cb; }
+  .empty-state .empty-btn.secondary:hover { background: #353560; }
+}
+
+/* === PRINT === */
+@media print {
+  body { background: #fff; padding: 0 !important; }
+  header, .controls, .empty-state, .documents-section h3, .notes-area,
+  .modal-overlay, .toast-container, .confirm-overlay { display: none !important; }
+  .card-wrapper { box-shadow: none; padding: 0; }
+  .card { box-shadow: 0 0 0 1px #ccc; display: flex !important; }
+  .documents-section { display: block !important; }
+  .documents-section.visible { display: block !important; }
+  .validity-bar.visible { display: flex !important; }
+  .notes-area.visible { display: block !important; }
+}
+</style>
+</head>
+<body>
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <div class="logo">
+      <h1>ESODI</h1>
+      <p>Carte Digitale Conducteur</p>
+    </div>
+    <div class="error-msg" id="loginError">Identifiant ou mot de passe incorrect</div>
+    <form id="loginForm" autocomplete="off">
+      <div class="form-row">
+        <label for="loginUser">Identifiant</label>
+        <input type="text" id="loginUser" placeholder="Entrez votre identifiant" autocomplete="username" required>
+      </div>
+      <div class="form-row">
+        <label for="loginPass">Mot de passe</label>
+        <input type="password" id="loginPass" placeholder="Entrez votre mot de passe" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="btn-login" id="btnLogin">Se connecter</button>
+    </form>
+    <div class="hint">Application r&eacute;serv&eacute;e au personnel autoris&eacute;</div>
+  </div>
+</div>
+<div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+<div class="container">
+  <header>
+    <h1>ESODI <span>Carte Digitale Conducteur</span></h1>
+    <div class="controls" role="toolbar" aria-label="Actions de la carte">
+      <label for="jsonInput">JSON</label>
+      <input type="file" id="jsonInput" accept=".json,application/json">
+      <label for="photoInput">Photo</label>
+      <input type="file" id="photoInput" accept="image/*">
+      <button type="button" id="btnTrips">Trajets</button>
+      <button type="button" id="btnExport" title="Exporter la carte et les trajets">Export</button>
+      <button type="button" id="btnPrint">Imprimer</button>
+      <button type="button" id="btnReset" title="Réinitialiser la carte">Reset</button>
+      <button type="button" id="btnLogout">Déconnexion</button>
+    </div>
+  </header>
+
+  <div class="card-wrapper">
+    <div class="empty-state" id="emptyState">
+      <div class="icon"></div>
+      <h2>Aucune carte chargée</h2>
+      <p>Importez un fichier JSON conducteur pour générer la carte digitale</p>
+      <div class="empty-actions">
+        <label for="jsonInput" class="empty-btn">Charger un JSON</label>
+        <button type="button" class="empty-btn secondary" id="btnLoadSample">Voir un exemple</button>
+      </div>
+    </div>
+
+    <div class="card" id="card" role="article" aria-label="Carte conducteur">
+      <div class="card-inner">
+        <div class="card-header">
+          <div class="card-brand">
+            <div class="name">ESODI</div>
+            <div class="sub">Transport &amp; Logistique</div>
+            <div class="title">Carte Conducteur</div>
+          </div>
+          <div class="card-id-badge" id="cardId">#---</div>
+        </div>
+        <div class="card-body">
+          <div class="card-photo" id="photoContainer" role="button" tabindex="0" aria-label="Ajouter ou modifier la photo" title="Cliquer pour ajouter une photo">
+            <div class="placeholder">Ajouter<br>une photo</div>
+          </div>
+          <div class="card-info">
+            <div class="field">
+              <span class="label">Nom &amp; Prénoms</span>
+              <span class="value highlight" id="f_fullName">---</span>
+            </div>
+            <div class="field">
+              <span class="label">N° Permis</span>
+              <span class="value" id="f_licenseNumber">---</span>
+            </div>
+            <div class="field">
+              <span class="label">Catégorie</span>
+              <span class="value" id="f_licenseType">---</span>
+            </div>
+            <div class="field">
+              <span class="label">Véhicule</span>
+              <span class="value" id="f_vehicle">---</span>
+            </div>
+            <div class="field">
+              <span class="label">Immatriculation</span>
+              <span class="value highlight" id="f_plate">---</span>
+            </div>
+            <div class="field">
+              <span class="label">Téléphone</span>
+              <span class="value" id="f_phone">---</span>
+            </div>
+            <div class="field">
+              <span class="label">Création</span>
+              <span class="value" id="f_creation">---</span>
+            </div>
+            <div class="field">
+              <span class="label">Validité</span>
+              <span class="value" id="f_validity">---</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <span>Document généré par ESODI</span>
+          <span>ID: <span id="footerId">---</span></span>
+          <span id="printDate"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="validity-bar" id="validityBar">
+      <div class="validity-item" id="vCreated">
+        <div class="v-label">Créée le</div>
+        <div class="v-value" id="vCreatedValue">--</div>
+      </div>
+      <div class="validity-item" id="vExpires">
+        <div class="v-label">Expire le</div>
+        <div class="v-value" id="vExpiresValue">--</div>
+      </div>
+      <div class="validity-item" id="vStatus">
+        <div class="v-label">Statut</div>
+        <div class="v-value" id="vStatusValue">--</div>
+      </div>
+    </div>
+
+    <div class="documents-section" id="documentsSection">
+      <h3>Documents &amp; Équipements</h3>
+      <div class="docs-grid" id="docsGrid"></div>
+    </div>
+
+    <div class="notes-area" id="notesArea">
+      <div class="notes-box">
+        <strong>Notes :</strong> <span id="notesText"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalTrips" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modalTitle">Trajets &amp; Activités</h2>
+      <button class="modal-close" id="modalClose" type="button" aria-label="Fermer">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="stats-bar" id="statsBar">
+        <div class="stat-item">
+          <span class="stat-icon">&#x1F4CD;</span>
+          <div class="stat-value" id="statTrips">0</div>
+          <div class="stat-label">Trajets</div>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">&#x1F697;</span>
+          <div class="stat-value" id="statKm">0</div>
+          <div class="stat-label">Km total</div>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">&#x1F4B0;</span>
+          <div class="stat-value" id="statCost">0</div>
+          <div class="stat-label">FCFA</div>
+        </div>
+      </div>
+
+      <form class="trip-form" id="tripForm" novalidate>
+        <div class="form-inline">
+          <div class="form-row">
+            <label for="tripDate">Date *</label>
+            <input type="date" id="tripDate" required>
+          </div>
+          <div class="form-row">
+            <label for="tripKm">Kilomètres (km)</label>
+            <input type="number" id="tripKm" placeholder="0" min="0" step="0.1" inputmode="decimal">
+          </div>
+        </div>
+        <div class="form-inline">
+          <div class="form-row">
+            <label for="tripFrom">Départ</label>
+            <input type="text" id="tripFrom" placeholder="Lieu de départ" autocomplete="off">
+          </div>
+          <div class="form-row">
+            <label for="tripTo">Destination</label>
+            <input type="text" id="tripTo" placeholder="Lieu d'arrivée" autocomplete="off">
+          </div>
+        </div>
+
+        <button type="button" class="btn-gps" id="btnGps" aria-label="Capturer ma position GPS">
+          <span class="gps-pulse" aria-hidden="true"></span> Capturer ma position GPS
+        </button>
+        <div class="gps-coords" id="gpsCoords" role="status">
+          <span id="gpsStatus">Aucune position capturée</span>
+        </div>
+        <input type="hidden" id="tripLat" value="">
+        <input type="hidden" id="tripLng" value="">
+
+        <div class="form-inline">
+          <div class="form-row">
+            <label for="tripPriceKm">Prix par km (FCFA)</label>
+            <input type="number" id="tripPriceKm" placeholder="0" min="0" step="5" inputmode="decimal">
+          </div>
+          <div class="form-row">
+            <label>Coût total</label>
+            <div class="cost-display" id="costDisplay" aria-live="polite">
+              <span class="cost-label">Total estimé</span>
+              <span id="costValue">0 FCFA</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-inline">
+          <div class="form-row">
+            <label for="tripClientName">Nom du client</label>
+            <input type="text" id="tripClientName" placeholder="Nom du client" autocomplete="off">
+          </div>
+          <div class="form-row">
+            <label for="tripClientContact">Contact client</label>
+            <input type="text" id="tripClientContact" placeholder="+228 XX XX XX XX" autocomplete="tel">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label for="tripPurpose">Motif / Activité</label>
+          <textarea id="tripPurpose" placeholder="Description de l'activité ou du motif du trajet"></textarea>
+        </div>
+        <button class="btn-submit" type="submit" id="btnSubmitTrip">+ Ajouter le trajet</button>
+      </form>
+
+      <div class="map-section">
+        <h4>Carte Google Maps</h4>
+        <div id="tripMap">
+          <div class="map-placeholder">Capturez votre position GPS pour voir la carte</div>
+        </div>
+        <button class="btn-open-maps" type="button" id="btnOpenMaps">Ouvrir dans Google Maps</button>
+      </div>
+
+      <div class="trip-list-header">
+        <div class="trip-list-title">
+          Historique des trajets
+          <span class="trip-count" id="tripCount">0</span>
+        </div>
+        <input type="search" class="trip-search" id="tripSearch" placeholder="Rechercher..." aria-label="Rechercher dans les trajets">
+      </div>
+      <div class="trip-list" id="tripList">
+        <div class="trip-empty" id="tripEmpty">Aucun trajet enregistré pour le moment.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM DIALOG -->
+<div class="confirm-overlay" id="confirmOverlay" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+  <div class="confirm-box">
+    <h3 id="confirmTitle">Confirmer</h3>
+    <p id="confirmMessage">Êtes-vous sûr ?</p>
+    <div class="confirm-actions">
+      <button class="confirm-btn cancel" type="button" id="confirmCancel">Annuler</button>
+      <button class="confirm-btn danger" type="button" id="confirmOk">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ====== CONSTANTS ======
+  var TRIPS_KEY = 'esodi_trips';
+  var CARD_KEY = 'esodi_card';
+  var PHOTO_KEY = 'esodi_photo';
+  var PRICE_KEY = 'esodi_price';
+  var DEFAULT_PRICE = 500;
+  var FALLBACK_COORDS = { lat: 5.3599, lng: -4.0083 };
+  var WHATSAPP_NUMBER = '22892871605';
+
+  // ====== STORAGE HELPERS ======
+  function storageGet(key, fallback) {
+    try {
+      var v = localStorage.getItem(key);
+      if (v === null) return fallback;
+      return v;
+    } catch (e) {
+      return fallback;
+    }
+  }
+
+  function storageSet(key, value) {
+    try {
+      localStorage.setItem(key, value);
+      return true;
+    } catch (e) {
+      toast('Stockage local indisponible', 'error');
+      return false;
+    }
+  }
+
+  function storageGetJSON(key, fallback) {
+    try {
+      var v = storageGet(key, null);
+      return v ? JSON.parse(v) : fallback;
+    } catch (e) {
+      return fallback;
+    }
+  }
+
+  // ====== TOAST ======
+  function toast(message, type) {
+    type = type || 'info';
+    var container = document.getElementById('toastContainer');
+    var t = document.createElement('div');
+    t.className = 'toast ' + type;
+    t.textContent = message;
+    container.appendChild(t);
+    setTimeout(function() {
+      t.classList.add('fadeout');
+      setTimeout(function() { if (t.parentNode) t.parentNode.removeChild(t); }, 300);
+    }, 3000);
+  }
+
+  // ====== AUTHENTICATION ======
+  var AUTH_USER = 'KOLA';
+  var AUTH_PASS = 'KOLA1@';
+  var AUTH_KEY = 'esodi_auth';
+
+  function isAuthenticated() {
+    return storageGet(AUTH_KEY, '') === 'yes';
+  }
+
+  function setAuthenticated() {
+    storageSet(AUTH_KEY, 'yes');
+  }
+
+  function showLogin() {
+    document.getElementById('loginOverlay').classList.remove('hidden');
+    document.getElementById('loginUser').focus();
+  }
+
+  function hideLogin() {
+    document.getElementById('loginOverlay').classList.add('hidden');
+  }
+
+  function attemptLogin(user, pass) {
+    if (user === AUTH_USER && pass === AUTH_PASS) {
+      setAuthenticated();
+      hideLogin();
+      toast('Connexion réussie', 'success');
+      return true;
+    }
+    var err = document.getElementById('loginError');
+    err.classList.add('visible');
+    err.textContent = 'Identifiant ou mot de passe incorrect';
+    document.getElementById('loginPass').value = '';
+    document.getElementById('loginPass').focus();
+    return false;
+  }
+
+  document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var user = document.getElementById('loginUser').value.trim();
+    var pass = document.getElementById('loginPass').value;
+    attemptLogin(user, pass);
+  });
+
+  document.getElementById('loginUser').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') document.getElementById('loginPass').focus();
+  });
+  document.getElementById('loginPass').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') document.getElementById('btnLogin').click();
+  });
+
+  // Logout
+  document.getElementById('btnLogout').addEventListener('click', function() {
+    confirmDialog(
+      'Déconnexion',
+      'Voulez-vous vraiment vous déconnecter ? La carte sera réinitialisée.',
+      function() {
+        storageSet(AUTH_KEY, '');
+        clearCard();
+        showLogin();
+        toast('Déconnecté', 'info');
+        document.getElementById('loginError').classList.remove('visible');
+      },
+      { okText: 'Déconnexion', danger: true }
+    );
+  });
+
+  // ====== CONFIRM DIALOG ======
+  function confirmDialog(title, message, onOk, opts) {
+    opts = opts || {};
+    var overlay = document.getElementById('confirmOverlay');
+    var okBtn = document.getElementById('confirmOk');
+    var cancelBtn = document.getElementById('confirmCancel');
+    document.getElementById('confirmTitle').textContent = title || 'Confirmer';
+    document.getElementById('confirmMessage').textContent = message || 'Êtes-vous sûr ?';
+
+    if (opts.danger === false) {
+      okBtn.className = 'confirm-btn primary';
+    } else {
+      okBtn.className = 'confirm-btn danger';
+    }
+    okBtn.textContent = opts.okText || 'Confirmer';
+    cancelBtn.textContent = opts.cancelText || 'Annuler';
+
+    function cleanup() {
+      overlay.classList.remove('open');
+      okBtn.onclick = null;
+      cancelBtn.onclick = null;
+    }
+
+    okBtn.onclick = function() {
+      cleanup();
+      if (onOk) onOk();
+    };
+    cancelBtn.onclick = cleanup;
+    overlay.classList.add('open');
+  }
+
+  // ====== DATE HELPERS ======
+  function formatDate(iso) {
+    if (!iso) return '---';
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return '---';
+    return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  }
+
+  function formatDateLong(iso) {
+    if (!iso) return 'Date inconnue';
+    var d = new Date(iso + (iso.length === 10 ? 'T00:00:00' : ''));
+    if (isNaN(d.getTime())) return 'Date inconnue';
+    return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' });
+  }
+
+  function getStatus(iso) {
+    if (!iso) return { label: 'Inconnu', cls: '' };
+    var expiry = new Date(iso);
+    if (isNaN(expiry.getTime())) return { label: 'Invalide', cls: '' };
+    var now = new Date();
+    var diff = expiry - now;
+    var daysLeft = Math.ceil(diff / (1000 * 60 * 60 * 24));
+    if (daysLeft < 0) return { label: 'Expirée', cls: 'expired' };
+    if (daysLeft <= 30) return { label: 'Expire bientôt (' + daysLeft + 'j)', cls: 'expired' };
+    return { label: 'Valide (' + daysLeft + 'j)', cls: 'valid' };
+  }
+
+  // ====== CARD RENDERING ======
+  function renderCard(data) {
+    if (!data || typeof data !== 'object') {
+      toast('Données de carte invalides', 'error');
+      return;
+    }
+
+    document.getElementById('card').classList.add('visible');
+    document.getElementById('emptyState').style.display = 'none';
+
+    function setText(id, value) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.textContent = (value !== undefined && value !== null && value !== '') ? value : '---';
+    }
+
+    setText('cardId', '#' + (data.id || '---'));
+    setText('footerId', data.id);
+    setText('f_fullName', data.fullName);
+    setText('f_licenseNumber', data.licenseNumber);
+    setText('f_licenseType', data.licenseTypeText || data.licenseType);
+    var vehicle = [data.vehicleModel, data.vehicleYear].filter(Boolean).join(' - ') || '';
+    var vehicleText = vehicle;
+    if (data.vehicleType) {
+      vehicleText = data.vehicleType.toUpperCase() + (vehicle ? ' : ' + vehicle : '');
+    }
+    setText('f_vehicle', vehicleText);
+    setText('f_plate', data.vehiclePlate);
+    setText('f_phone', data.phone);
+    setText('f_creation', formatDate(data.creationDate));
+    setText('f_validity', formatDate(data.validityDate));
+
+    document.getElementById('printDate').textContent = 'Imprimé le ' + new Date().toLocaleDateString('fr-FR');
+
+    document.getElementById('validityBar').classList.add('visible');
+    setText('vCreatedValue', formatDate(data.creationDate));
+    setText('vExpiresValue', formatDate(data.validityDate));
+    var status = getStatus(data.validityDate);
+    document.getElementById('vStatus').className = 'validity-item ' + status.cls;
+    setText('vStatusValue', status.label);
+
+    var docsSection = document.getElementById('documentsSection');
+    var grid = document.getElementById('docsGrid');
+    if (Array.isArray(data.parts) && data.parts.length) {
+      docsSection.classList.add('visible');
+      grid.innerHTML = '';
+      data.parts.forEach(function(p) {
+        if (!p || !p.name) return;
+        var item = document.createElement('div');
+        item.className = 'doc-item';
+
+        var dot = document.createElement('span');
+        dot.className = 'dot';
+        if (p.checked) dot.classList.add('checked');
+        else if (p.required) dot.classList.add('required');
+        else dot.classList.add('unchecked');
+        item.appendChild(dot);
+
+        var label = document.createElement('span');
+        label.className = 'doc-label';
+        label.textContent = p.name;
+        item.appendChild(label);
+
+        var badge = document.createElement('span');
+        badge.className = 'doc-badge ' + (p.required ? 'obligatoire' : 'optionnel');
+        badge.textContent = p.required ? 'Obligatoire' : 'Optionnel';
+        item.appendChild(badge);
+
+        grid.appendChild(item);
+      });
+    } else {
+      docsSection.classList.remove('visible');
+    }
+
+    var notesArea = document.getElementById('notesArea');
+    if (data.notes && String(data.notes).trim()) {
+      notesArea.classList.add('visible');
+      document.getElementById('notesText').textContent = data.notes;
+    } else {
+      notesArea.classList.remove('visible');
+    }
+  }
+
+  function clearCard() {
+    document.getElementById('card').classList.remove('visible');
+    document.getElementById('validityBar').classList.remove('visible');
+    document.getElementById('documentsSection').classList.remove('visible');
+    document.getElementById('notesArea').classList.remove('visible');
+    document.getElementById('emptyState').style.display = '';
+    var photo = document.getElementById('photoContainer');
+    photo.innerHTML = '<div class="placeholder">Ajouter<br>une photo</div>';
+
+    var defaults = {
+      'cardId': '#---', 'footerId': '---', 'f_fullName': '---',
+      'f_licenseNumber': '---', 'f_licenseType': '---', 'f_vehicle': '---',
+      'f_plate': '---', 'f_phone': '---', 'f_creation': '---', 'f_validity': '---',
+      'vCreatedValue': '--', 'vExpiresValue': '--', 'vStatusValue': '--', 'printDate': ''
+    };
+    Object.keys(defaults).forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = defaults[id];
+    });
+    document.getElementById('vStatus').className = 'validity-item';
+    storageSet(CARD_KEY, '');
+    storageSet(PHOTO_KEY, '');
+    window.__cardData = null;
+  }
+
+  // ====== FILE: JSON ======
+  document.getElementById('jsonInput').addEventListener('change', function(e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast('Fichier trop volumineux (max 5 Mo)', 'error');
+      e.target.value = '';
+      return;
+    }
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      try {
+        var data = JSON.parse(ev.target.result);
+        renderCard(data);
+        window.__cardData = data;
+        storageSet(CARD_KEY, JSON.stringify(data));
+        toast('Carte chargée avec succès', 'success');
+      } catch (err) {
+        toast('Erreur JSON : ' + err.message, 'error');
+      }
+    };
+    reader.onerror = function() {
+      toast('Impossible de lire le fichier', 'error');
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  });
+
+  // ====== FILE: PHOTO ======
+  document.getElementById('photoInput').addEventListener('change', function(e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    if (!file.type || file.type.indexOf('image/') !== 0) {
+      toast('Le fichier doit être une image', 'error');
+      e.target.value = '';
+      return;
+    }
+    if (file.size > 3 * 1024 * 1024) {
+      toast('Image trop volumineuse (max 3 Mo)', 'error');
+      e.target.value = '';
+      return;
+    }
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      applyPhoto(ev.target.result);
+      storageSet(PHOTO_KEY, ev.target.result);
+      toast('Photo ajoutée', 'success');
+    };
+    reader.onerror = function() {
+      toast("Impossible de lire l'image", 'error');
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  });
+
+  function applyPhoto(src) {
+    var container = document.getElementById('photoContainer');
+    container.innerHTML = '';
+    var img = document.createElement('img');
+    img.src = src;
+    img.alt = 'Photo conducteur';
+    container.appendChild(img);
+  }
+
+  document.getElementById('photoContainer').addEventListener('click', function() {
+    document.getElementById('photoInput').click();
+  });
+  document.getElementById('photoContainer').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      document.getElementById('photoInput').click();
+    }
+  });
+
+  // ====== TRIPS ======
+  var gpsLat = null;
+  var gpsLng = null;
+  var editingTripId = null;
+
+  function getTrips() {
+    return storageGetJSON(TRIPS_KEY, []);
+  }
+
+  function saveTrips(trips) {
+    storageSet(TRIPS_KEY, JSON.stringify(trips));
+  }
+
+  function calcCost(km, priceKm) {
+    var k = parseFloat(km) || 0;
+    var p = parseFloat(priceKm) || 0;
+    return k * p;
+  }
+
+  function sendWhatsApp(trip) {
+    var card = window.__cardData;
+    var msg = '*ESODI - Trajet enregistr\u00e9*\n';
+    msg += '\uD83D\uDCC5 Date : ' + (trip.date ? new Date(trip.date + 'T00:00:00').toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' }) : 'Non sp\u00e9cifi\u00e9e') + '\n';
+    msg += '\uD83D\uDCCD D\u00e9part : ' + (trip.from || 'Non sp\u00e9cifi\u00e9') + '\n';
+    msg += '\uD83C\uDF1F Destination : ' + (trip.to || 'Non sp\u00e9cifi\u00e9') + '\n';
+    msg += '\uD83D\uDEE4\uFE0F Km : ' + (trip.km || '0') + ' km\n';
+    msg += '\uD83D\uDCB0 Co\u00fbt : ' + calcCost(trip.km, trip.priceKm).toLocaleString('fr-FR') + ' FCFA\n';
+    msg += '\uD83D\uDC64 Client : ' + (trip.clientName || 'Non sp\u00e9cifi\u00e9') + '\n';
+    msg += '\uD83D\uDCF1 Contact : ' + (trip.clientContact || 'Non sp\u00e9cifi\u00e9') + '\n';
+    if (trip.purpose) msg += '\uD83D\uDCDD Motif : ' + trip.purpose + '\n';
+    if (trip.lat && trip.lng) {
+      msg += '\uD83D\uDCCD Position : https://www.google.com/maps?q=' + trip.lat + ',' + trip.lng + '\n';
+    }
+    if (card && card.fullName) msg += '\n\uD83D\uDC64 Conducteur : ' + card.fullName;
+    if (card && card.vehiclePlate) msg += '\n\uD83D\uDE9B V\u00e9hicule : ' + card.vehiclePlate;
+    var url = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(msg);
+    window.open(url, '_blank', 'noopener');
+  }
+
+  function updateCost() {
+    var km = document.getElementById('tripKm').value;
+    var price = document.getElementById('tripPriceKm').value;
+    var total = calcCost(km, price);
+    document.getElementById('costValue').textContent = total.toLocaleString('fr-FR') + ' FCFA';
+  }
+
+  document.getElementById('tripKm').addEventListener('input', updateCost);
+  document.getElementById('tripPriceKm').addEventListener('input', function() {
+    updateCost();
+    storageSet(PRICE_KEY, this.value);
+  });
+
+  function getGmapsUrl(lat, lng, from, to) {
+    var url = 'https://www.google.com/maps/dir/?api=1&';
+    if (lat && lng) url += 'origin=' + lat + ',' + lng + '&';
+    if (to) url += 'destination=' + encodeURIComponent(to);
+    else if (from) url += 'destination=' + encodeURIComponent(from);
+    else if (lat && lng) url = 'https://www.google.com/maps/search/?api=1&query=' + lat + ',' + lng;
+    else url = 'https://www.google.com/maps';
+    if (from && to && lat && lng) url += '&waypoints=' + encodeURIComponent(from);
+    return url;
+  }
+
+  function getGmapsEmbedUrl(lat, lng) {
+    var lo = lat || FALLBACK_COORDS.lat;
+    var la = lng || FALLBACK_COORDS.lng;
+    return 'https://maps.google.com/maps?q=' + lo + ',' + la + '&z=15&output=embed';
+  }
+
+  function updateMapDisplay(lat, lng) {
+    var container = document.getElementById('tripMap');
+    var url = getGmapsEmbedUrl(lat, lng);
+    container.innerHTML = '<iframe src="' + url + '" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen title="Carte Google Maps"></iframe>';
+  }
+
+  // GPS
+  document.getElementById('btnGps').addEventListener('click', function() {
+    var btn = this;
+    var statusEl = document.getElementById('gpsStatus');
+    var coordsEl = document.getElementById('gpsCoords');
+
+    if (!navigator.geolocation) {
+      toast('GPS non supporté sur cet appareil', 'error');
+      statusEl.textContent = 'GPS non supporté';
+      return;
+    }
+
+    btn.classList.add('loading');
+    btn.disabled = true;
+    statusEl.textContent = 'Recherche du signal GPS...';
+
+    navigator.geolocation.getCurrentPosition(
+      function(pos) {
+        gpsLat = pos.coords.latitude;
+        gpsLng = pos.coords.longitude;
+        document.getElementById('tripLat').value = gpsLat;
+        document.getElementById('tripLng').value = gpsLng;
+        coordsEl.className = 'gps-coords success';
+        statusEl.textContent = 'Lat: ' + gpsLat.toFixed(6) + ', Lng: ' + gpsLng.toFixed(6);
+        btn.classList.remove('loading');
+        btn.disabled = false;
+        updateMapDisplay(gpsLat, gpsLng);
+        toast('Position GPS capturée', 'success');
+
+        // Reverse geocoding (best-effort)
+        try {
+          fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + gpsLat + '&lon=' + gpsLng + '&accept-language=fr&zoom=18')
+            .then(function(r) { return r.ok ? r.json() : null; })
+            .then(function(addr) {
+              if (addr && addr.display_name) {
+                var fromField = document.getElementById('tripFrom');
+                if (!fromField.value) {
+                  fromField.value = addr.display_name.split(', ').slice(0, 4).join(', ');
+                }
+              }
+            })
+            .catch(function() { /* silent */ });
+        } catch (e) { /* silent */ }
+      },
+      function(err) {
+        btn.classList.remove('loading');
+        btn.disabled = false;
+        coordsEl.className = 'gps-coords';
+        var msg = 'Erreur GPS';
+        switch(err.code) {
+          case 1: msg = 'Autorisation GPS refusée'; break;
+          case 2: msg = 'Signal GPS indisponible'; break;
+          case 3: msg = 'Recherche GPS expirée'; break;
+          default: msg = 'Erreur GPS (' + (err.message || 'inconnue') + ')';
+        }
+        statusEl.textContent = msg;
+        toast(msg, 'error');
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
+    );
+  });
+
+  document.getElementById('btnOpenMaps').addEventListener('click', function() {
+    var lat = document.getElementById('tripLat').value;
+    var lng = document.getElementById('tripLng').value;
+    var from = document.getElementById('tripFrom').value.trim();
+    var to = document.getElementById('tripTo').value.trim();
+    var url = getGmapsUrl(lat || null, lng || null, from || null, to || null);
+    window.open(url, '_blank', 'noopener');
+  });
+
+  // ====== RENDER TRIPS ======
+  function updateStats(trips) {
+    var totalKm = 0;
+    var totalCost = 0;
+    trips.forEach(function(t) {
+      var km = parseFloat(t.km) || 0;
+      var price = parseFloat(t.priceKm) || 0;
+      totalKm += km;
+      totalCost += km * price;
+    });
+    document.getElementById('statTrips').textContent = trips.length;
+    document.getElementById('statKm').textContent = totalKm.toLocaleString('fr-FR', { maximumFractionDigits: 1 });
+    document.getElementById('statCost').textContent = totalCost.toLocaleString('fr-FR', { maximumFractionDigits: 0 });
+  }
+
+  function renderTrips(filter) {
+    var trips = getTrips();
+    var list = document.getElementById('tripList');
+    var empty = document.getElementById('tripEmpty');
+    var count = document.getElementById('tripCount');
+    var search = (filter || '').toLowerCase().trim();
+
+    count.textContent = trips.length + ' trajet' + (trips.length > 1 ? 's' : '');
+
+    list.querySelectorAll('.trip-card').forEach(function(el) { el.remove(); });
+
+    updateStats(trips);
+
+    var filtered = search
+      ? trips.filter(function(t) {
+          return (t.from && t.from.toLowerCase().indexOf(search) !== -1) ||
+                 (t.to && t.to.toLowerCase().indexOf(search) !== -1) ||
+                 (t.purpose && t.purpose.toLowerCase().indexOf(search) !== -1) ||
+                 (t.date && t.date.toLowerCase().indexOf(search) !== -1);
+        })
+      : trips;
+
+    if (!trips.length) {
+      empty.style.display = 'block';
+      empty.textContent = 'Aucun trajet enregistré pour le moment.';
+      return;
+    }
+    if (!filtered.length) {
+      empty.style.display = 'block';
+      empty.textContent = 'Aucun trajet ne correspond à votre recherche.';
+      return;
+    }
+    empty.style.display = 'none';
+
+    filtered.slice().reverse().forEach(function(t) {
+      var card = document.createElement('div');
+      card.className = 'trip-card';
+
+      var actions = document.createElement('div');
+      actions.className = 'trip-actions';
+
+      var editBtn = document.createElement('button');
+      editBtn.className = 'trip-action-btn';
+      editBtn.type = 'button';
+      editBtn.innerHTML = '&#x270F;&#xFE0F;';
+      editBtn.title = 'Modifier';
+      editBtn.setAttribute('aria-label', 'Modifier ce trajet');
+      editBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        loadTripForEdit(t);
+      });
+      actions.appendChild(editBtn);
+
+      var delBtn = document.createElement('button');
+      delBtn.className = 'trip-action-btn delete';
+      delBtn.type = 'button';
+      delBtn.innerHTML = '&#x1F5D1;&#xFE0F;';
+      delBtn.title = 'Supprimer';
+      delBtn.setAttribute('aria-label', 'Supprimer ce trajet');
+      delBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        confirmDialog(
+          'Supprimer le trajet',
+          'Voulez-vous vraiment supprimer ce trajet du ' + formatDateLong(t.date) + ' ?',
+          function() {
+            var all = getTrips();
+            var i = all.findIndex(function(x) { return x.id === t.id; });
+            if (i !== -1) {
+              all.splice(i, 1);
+              saveTrips(all);
+              renderTrips(document.getElementById('tripSearch').value);
+              toast('Trajet supprimé', 'success');
+            }
+          }
+        );
+      });
+      actions.appendChild(delBtn);
+
+      card.appendChild(actions);
+
+      var dateEl = document.createElement('div');
+      dateEl.className = 'trip-date';
+      dateEl.textContent = formatDateLong(t.date);
+      card.appendChild(dateEl);
+
+      if (t.from || t.to) {
+        var route = document.createElement('div');
+        route.className = 'trip-route';
+        var fromSpan = document.createElement('span');
+        fromSpan.textContent = t.from || '---';
+        route.appendChild(fromSpan);
+        var arrow = document.createElement('span');
+        arrow.className = 'arrow';
+        arrow.textContent = '\u2192';
+        route.appendChild(arrow);
+        var toSpan = document.createElement('span');
+        toSpan.textContent = t.to || '---';
+        route.appendChild(toSpan);
+        card.appendChild(route);
+      }
+
+      var details = document.createElement('div');
+      details.className = 'trip-details';
+      if (t.km) {
+        var kmEl = document.createElement('span');
+        kmEl.textContent = t.km + ' km';
+        details.appendChild(kmEl);
+      }
+      if (t.priceKm && t.km) {
+        var cost = calcCost(t.km, t.priceKm);
+        var costEl = document.createElement('span');
+        costEl.className = 'trip-cost';
+        costEl.textContent = cost.toLocaleString('fr-FR') + ' FCFA';
+        details.appendChild(costEl);
+      }
+      if (t.lat && t.lng) {
+        var gpsEl = document.createElement('span');
+        gpsEl.textContent = parseFloat(t.lat).toFixed(4) + ', ' + parseFloat(t.lng).toFixed(4);
+        details.appendChild(gpsEl);
+      }
+      if (details.children.length) card.appendChild(details);
+
+      if (t.clientName || t.clientContact) {
+        var clientDiv = document.createElement('div');
+        clientDiv.className = 'trip-purpose';
+        clientDiv.style.borderTop = '1px dashed var(--border)';
+        clientDiv.style.paddingTop = '4px';
+        clientDiv.style.marginTop = '4px';
+        clientDiv.style.fontSize = '12px';
+        clientDiv.style.color = 'var(--text-muted)';
+        var clientText = '';
+        if (t.clientName) clientText += t.clientName;
+        if (t.clientContact) clientText += (clientText ? ' - ' : '') + t.clientContact;
+        clientDiv.textContent = 'Client : ' + clientText;
+        card.appendChild(clientDiv);
+      }
+
+      if (t.purpose) {
+        var purpose = document.createElement('div');
+        purpose.className = 'trip-purpose';
+        purpose.textContent = t.purpose;
+        card.appendChild(purpose);
+      }
+
+      card.addEventListener('click', function(e) {
+        if (e.target.closest && e.target.closest('.trip-actions')) return;
+        var url = getGmapsUrl(t.lat, t.lng, t.from, t.to);
+        window.open(url, '_blank', 'noopener');
+      });
+
+      list.appendChild(card);
+    });
+  }
+
+  function loadTripForEdit(t) {
+    editingTripId = t.id;
+    document.getElementById('tripDate').value = t.date || '';
+    document.getElementById('tripKm').value = t.km || '';
+    document.getElementById('tripFrom').value = t.from || '';
+    document.getElementById('tripTo').value = t.to || '';
+    document.getElementById('tripLat').value = t.lat || '';
+    document.getElementById('tripLng').value = t.lng || '';
+    document.getElementById('tripPriceKm').value = t.priceKm || '';
+    document.getElementById('tripClientName').value = t.clientName || '';
+    document.getElementById('tripClientContact').value = t.clientContact || '';
+    document.getElementById('tripPurpose').value = t.purpose || '';
+    gpsLat = t.lat ? parseFloat(t.lat) : null;
+    gpsLng = t.lng ? parseFloat(t.lng) : null;
+
+    var statusEl = document.getElementById('gpsStatus');
+    var coordsEl = document.getElementById('gpsCoords');
+    if (gpsLat && gpsLng) {
+      coordsEl.className = 'gps-coords success';
+      statusEl.textContent = 'Lat: ' + gpsLat.toFixed(6) + ', Lng: ' + gpsLng.toFixed(6);
+      updateMapDisplay(gpsLat, gpsLng);
+    } else {
+      coordsEl.className = 'gps-coords';
+      statusEl.textContent = 'Aucune position capturée';
+    }
+
+    updateCost();
+    document.getElementById('btnSubmitTrip').textContent = 'Mettre à jour le trajet';
+    try {
+      document.getElementById('tripDate').focus();
+      document.getElementById('tripForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch(e) { /* silent */ }
+  }
+
+  function resetTripForm() {
+    var form = document.getElementById('tripForm');
+    form.reset();
+    editingTripId = null;
+    document.getElementById('tripDate').value = new Date().toISOString().split('T')[0];
+    var storedPrice = storageGet(PRICE_KEY, String(DEFAULT_PRICE));
+    document.getElementById('tripPriceKm').value = storedPrice;
+    document.getElementById('costValue').textContent = '0 FCFA';
+    document.getElementById('gpsCoords').className = 'gps-coords';
+    document.getElementById('gpsStatus').textContent = 'Aucune position capturée';
+    document.getElementById('tripLat').value = '';
+    document.getElementById('tripLng').value = '';
+    gpsLat = null;
+    gpsLng = null;
+    document.getElementById('tripMap').innerHTML = '<div class="map-placeholder">Capturez votre position GPS pour voir la carte</div>';
+    document.getElementById('btnSubmitTrip').textContent = '+ Ajouter le trajet';
+  }
+
+  document.getElementById('tripForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var date = document.getElementById('tripDate').value;
+    if (!date) {
+      toast('La date est obligatoire', 'error');
+      return;
+    }
+    var trips = getTrips();
+    var trip = {
+      id: editingTripId || Date.now(),
+      date: date,
+      from: document.getElementById('tripFrom').value.trim(),
+      to: document.getElementById('tripTo').value.trim(),
+      km: document.getElementById('tripKm').value,
+      priceKm: document.getElementById('tripPriceKm').value,
+      lat: document.getElementById('tripLat').value,
+      lng: document.getElementById('tripLng').value,
+      clientName: document.getElementById('tripClientName').value.trim(),
+      clientContact: document.getElementById('tripClientContact').value.trim(),
+      purpose: document.getElementById('tripPurpose').value.trim(),
+      updatedAt: new Date().toISOString()
+    };
+
+    if (editingTripId) {
+      var idx = trips.findIndex(function(t) { return t.id === editingTripId; });
+      if (idx !== -1) {
+        trips[idx] = trip;
+        toast('Trajet mis à jour', 'success');
+      }
+    } else {
+      trip.createdAt = new Date().toISOString();
+      trips.push(trip);
+      toast('Trajet ajouté', 'success');
+      sendWhatsApp(trip);
+    }
+
+    saveTrips(trips);
+    renderTrips(document.getElementById('tripSearch').value);
+    resetTripForm();
+  });
+
+  document.getElementById('tripSearch').addEventListener('input', function() {
+    renderTrips(this.value);
+  });
+
+  // ====== MODAL OPEN/CLOSE ======
+  function openTripsModal() {
+    document.getElementById('modalTrips').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    if (!document.getElementById('tripDate').value) {
+      document.getElementById('tripDate').value = new Date().toISOString().split('T')[0];
+    }
+    var storedPrice = storageGet(PRICE_KEY, String(DEFAULT_PRICE));
+    if (!document.getElementById('tripPriceKm').value) {
+      document.getElementById('tripPriceKm').value = storedPrice;
+    }
+    updateCost();
+    renderTrips();
+  }
+
+  function closeModal() {
+    document.getElementById('modalTrips').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  document.getElementById('btnTrips').addEventListener('click', openTripsModal);
+  document.getElementById('modalClose').addEventListener('click', closeModal);
+  document.getElementById('modalTrips').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      if (document.getElementById('confirmOverlay').classList.contains('open')) {
+        document.getElementById('confirmCancel').click();
+      } else if (document.getElementById('modalTrips').classList.contains('open')) {
+        closeModal();
+      }
+    }
+  });
+
+  // ====== EXPORT ======
+  document.getElementById('btnExport').addEventListener('click', function() {
+    if (!window.__cardData) {
+      toast('Aucune carte à exporter', 'warning');
+      return;
+    }
+    var trips = getTrips();
+    var exportData = {
+      exportedAt: new Date().toISOString(),
+      driver: window.__cardData,
+      trips: trips,
+      statistics: {
+        totalTrips: trips.length,
+        totalKm: trips.reduce(function(s, t) { return s + (parseFloat(t.km) || 0); }, 0),
+        totalCost: trips.reduce(function(s, t) { return s + calcCost(t.km, t.priceKm); }, 0)
+      }
+    };
+    downloadFile(
+      'esodi-carte-' + (window.__cardData.id || 'export') + '-' + new Date().toISOString().split('T')[0] + '.json',
+      JSON.stringify(exportData, null, 2),
+      'application/json'
+    );
+    toast('Export JSON téléchargé', 'success');
+  });
+
+  function downloadFile(filename, content, mimeType) {
+    var blob = new Blob([content], { type: mimeType });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function() {
+      if (a.parentNode) a.parentNode.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 100);
+  }
+
+  // ====== PRINT ======
+  document.getElementById('btnPrint').addEventListener('click', function() {
+    if (!window.__cardData) {
+      toast('Aucune carte à imprimer', 'warning');
+      return;
+    }
+    window.print();
+  });
+
+  // ====== RESET ======
+  document.getElementById('btnReset').addEventListener('click', function() {
+    confirmDialog(
+      'Réinitialiser la carte',
+      'Voulez-vous effacer la carte, la photo et tous les trajets ? Cette action est irréversible.',
+      function() {
+        var trips = getTrips();
+        if (trips.length) saveTrips([]);
+        clearCard();
+        toast('Carte réinitialisée', 'success');
+      }
+    );
+  });
+
+  // ====== SAMPLE DATA ======
+  document.getElementById('btnLoadSample').addEventListener('click', function() {
+    var sample = {
+      id: 'ESODI-2026-001',
+      fullName: 'KOUASSI Jean-Marie',
+      licenseNumber: 'CI-2024-A1B2C3',
+      licenseType: 'C',
+      licenseTypeText: 'C - Poids lourd',
+      vehicleType: 'camion',
+      vehicleModel: 'Mercedes-Benz Actros',
+      vehicleYear: '2022',
+      vehiclePlate: 'AB-1234-CI',
+      phone: '+225 07 00 00 00 00',
+      creationDate: '2026-01-15',
+      validityDate: '2029-01-15',
+      parts: [
+        { name: 'Permis de conduire', checked: true, required: true },
+        { name: 'Carte grise', checked: true, required: true },
+        { name: 'Assurance véhicule', checked: true, required: true },
+        { name: 'Visite technique', checked: false, required: true },
+        { name: 'Formation transport', checked: true, required: false },
+        { name: 'Carte chronotachygraphe', checked: true, required: false },
+        { name: 'Éthylotest', checked: true, required: false },
+        { name: 'Gilets réfléchissants', checked: true, required: false },
+        { name: 'Triangle de signalisation', checked: true, required: false },
+        { name: 'Extincteur', checked: false, required: false }
+      ],
+      notes: 'Conducteur expérimenté - Spécialisé longues distances. À contacter en priorité pour les livraisons inter-États.'
+    };
+    renderCard(sample);
+    window.__cardData = sample;
+    storageSet(CARD_KEY, JSON.stringify(sample));
+    toast('Exemple chargé', 'success');
+  });
+
+  // ====== RESTORE LAST SESSION ======
+  function restoreSession() {
+    if (!isAuthenticated()) {
+      showLogin();
+      return;
+    }
+    hideLogin();
+    var savedCard = storageGet(CARD_KEY, '');
+    if (savedCard) {
+      try {
+        var data = JSON.parse(savedCard);
+        renderCard(data);
+        window.__cardData = data;
+      } catch (e) { /* silent */ }
+    }
+    var savedPhoto = storageGet(PHOTO_KEY, '');
+    if (savedPhoto) {
+      applyPhoto(savedPhoto);
+    }
+  }
+
+  // ====== INIT ======
+  restoreSession();
+})();
+</script>
+</body>
+</html>

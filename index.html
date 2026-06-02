@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1a237e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="description" content="ESODI Transport - Plateforme de gestion des transports et réservations">
+<title>ESODI Transport - Plateforme Digitale</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --primary: #1a237e;
+  --primary-dark: #0d47a1;
+  --primary-light: #5c6bc0;
+  --success: #2e7d32;
+  --warning: #e65100;
+  --bg: #f0f2f5;
+  --card-bg: #fff;
+  --text: #222;
+  --text-muted: #666;
+  --border: #e0e0e0;
+  --shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #121212;
+    --card-bg: #1e1e1e;
+    --text: #e0e0e0;
+    --text-muted: #aaa;
+    --border: #333;
+    --shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--text);
+  padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+  max-width: 1100px;
+  width: 100%;
+  padding: 0 12px;
+  margin: -40px auto 0;
+  position: relative;
+  z-index: 2;
+}
+
+/* ====== HERO ====== */
+.hero {
+  width: 100%;
+  background: linear-gradient(135deg, #1a237e 0%, #0d47a1 50%, #1565c0 100%);
+  color: #fff;
+  padding: clamp(48px, 12vw, 80px) clamp(16px, 5vw, 40px);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(ellipse at 30% 50%, rgba(255,255,255,0.08) 0%, transparent 60%);
+  animation: heroFloat 20s ease-in-out infinite;
+}
+
+@keyframes heroFloat {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(2%, -2%); }
+}
+
+.hero .badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  padding: clamp(5px, 1.5vw, 8px) clamp(12px, 3vw, 20px);
+  border-radius: 20px;
+  font-size: clamp(10px, 2vw, 13px);
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: clamp(8px, 2vw, 16px);
+  position: relative;
+  z-index: 1;
+}
+
+.hero h1 {
+  font-size: clamp(28px, 8vw, 52px);
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  position: relative;
+  z-index: 1;
+  line-height: 1.1;
+}
+
+.hero p {
+  font-size: clamp(13px, 3vw, 18px);
+  opacity: 0.9;
+  margin-top: clamp(6px, 1.5vw, 12px);
+  position: relative;
+  z-index: 1;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.5;
+}
+
+/* ====== PLATFORM CARDS ====== */
+.platform-cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-bottom: clamp(24px, 5vw, 40px);
+}
+
+.platform-card {
+  background: var(--card-bg);
+  border-radius: 14px;
+  padding: clamp(18px, 4vw, 32px);
+  text-align: center;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s, box-shadow 0.2s;
+  text-decoration: none;
+  color: var(--text);
+  display: block;
+  position: relative;
+  overflow: hidden;
+  min-height: 44px;
+}
+
+.platform-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+}
+
+.platform-card:active {
+  transform: scale(0.98);
+}
+
+.platform-card .icon {
+  width: clamp(48px, 10vw, 64px);
+  height: clamp(48px, 10vw, 64px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(22px, 5vw, 30px);
+  margin: 0 auto clamp(8px, 2vw, 14px);
+}
+
+.platform-card.client .icon { background: #e8eaf6; }
+.platform-card.driver .icon { background: #e8f5e9; }
+.platform-card.admin .icon { background: #fff3e0; }
+
+.platform-card h3 {
+  font-size: clamp(16px, 3.5vw, 20px);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.platform-card.client h3 { color: var(--primary); }
+.platform-card.driver h3 { color: var(--success); }
+.platform-card.admin h3 { color: var(--warning); }
+
+.platform-card p {
+  font-size: clamp(12px, 2.5vw, 14px);
+  color: var(--text-muted);
+  line-height: 1.5;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.platform-card .btn-access {
+  display: inline-block;
+  margin-top: clamp(10px, 2vw, 16px);
+  padding: clamp(8px, 2vw, 12px) clamp(20px, 4vw, 32px);
+  border-radius: 8px;
+  font-size: clamp(13px, 2.5vw, 15px);
+  font-weight: 700;
+  font-family: inherit;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  min-height: 44px;
+}
+
+.platform-card .btn-access:hover { opacity: 0.85; }
+
+.platform-card.client .btn-access { background: var(--primary); color: #fff; }
+.platform-card.driver .btn-access { background: var(--success); color: #fff; }
+.platform-card.admin .btn-access { background: var(--warning); color: #fff; }
+
+.platform-card .tag {
+  position: absolute;
+  top: clamp(8px, 2vw, 12px);
+  right: clamp(8px, 2vw, 12px);
+  font-size: clamp(8px, 1.8vw, 11px);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.platform-card.client .tag { background: #e8eaf6; color: var(--primary); }
+.platform-card.driver .tag { background: #e8f5e9; color: var(--success); }
+.platform-card.admin .tag { background: #fff3e0; color: var(--warning); }
+
+/* ====== SECTION TITLES ====== */
+.section-title {
+  font-size: clamp(18px, 4.5vw, 28px);
+  font-weight: 700;
+  color: var(--primary);
+  text-align: center;
+  margin-bottom: clamp(14px, 3vw, 24px);
+  line-height: 1.2;
+}
+
+.section-title span { color: var(--text-muted); }
+
+/* ====== ADVANTAGES ====== */
+.advantages {
+  background: var(--card-bg);
+  border-radius: 14px;
+  padding: clamp(14px, 3vw, 36px);
+  box-shadow: var(--shadow);
+  margin-bottom: clamp(24px, 5vw, 40px);
+}
+
+.adv-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(14px, 3vw, 20px);
+}
+
+.adv-item {
+  display: flex;
+  gap: clamp(10px, 2vw, 14px);
+  align-items: flex-start;
+}
+
+.adv-item .adv-icon {
+  width: clamp(36px, 8vw, 44px);
+  height: clamp(36px, 8vw, 44px);
+  border-radius: 10px;
+  background: #e8eaf6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(16px, 3.5vw, 20px);
+  flex-shrink: 0;
+}
+
+.adv-item h4 {
+  font-size: clamp(13px, 2.5vw, 15px);
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.adv-item p {
+  font-size: clamp(11px, 2.2vw, 13px);
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* ====== FEATURES ====== */
+.features {
+  background: var(--card-bg);
+  border-radius: 14px;
+  padding: clamp(14px, 3vw, 36px);
+  box-shadow: var(--shadow);
+  margin-bottom: clamp(24px, 5vw, 40px);
+}
+
+.feature-row {
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(10px, 2vw, 16px);
+  padding: clamp(10px, 2vw, 14px) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.feature-row:last-child { border-bottom: none; }
+
+.feature-row .dot {
+  width: clamp(8px, 1.5vw, 10px);
+  height: clamp(8px, 1.5vw, 10px);
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.feature-row .dot.blue { background: var(--primary); }
+.feature-row .dot.green { background: var(--success); }
+.feature-row .dot.orange { background: var(--warning); }
+
+.feature-row .f-text {
+  font-size: clamp(12px, 2.3vw, 14px);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.feature-row .f-text strong { color: var(--primary); }
+
+/* ====== FOOTER ====== */
+footer {
+  width: 100%;
+  background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+  color: #fff;
+  padding: clamp(20px, 5vw, 32px) clamp(12px, 3vw, 16px);
+  text-align: center;
+  margin-top: auto;
+}
+
+footer p {
+  font-size: clamp(11px, 2.2vw, 13px);
+  opacity: 0.8;
+  line-height: 1.6;
+}
+
+footer strong { opacity: 1; }
+
+/* ====== RESPONSIVE SMALL PHONES <= 360px ====== */
+@media (max-width: 360px) {
+  body { padding: 0; }
+
+  .container { padding: 0 8px; margin-top: -30px; }
+
+  .hero {
+    padding: 36px 12px;
+  }
+
+  .hero h1 { font-size: 26px; }
+  .hero p { font-size: 12px; }
+
+  .platform-card { padding: 14px 10px; border-radius: 12px; }
+  .platform-card .icon { width: 44px; height: 44px; font-size: 20px; }
+  .platform-card h3 { font-size: 15px; }
+  .platform-card p { font-size: 11px; }
+  .platform-card .btn-access { font-size: 12px; padding: 8px 16px; min-height: 40px; }
+
+  .advantages, .features { padding: 12px; }
+  .adv-item .adv-icon { width: 32px; height: 32px; font-size: 14px; }
+  .adv-item h4 { font-size: 12px; }
+  .adv-item p { font-size: 11px; }
+
+  .feature-row .f-text { font-size: 11px; }
+}
+
+/* ====== RESPONSIVE TABLETS 640px+ ====== */
+@media (min-width: 640px) {
+  .container { padding: 0 20px; }
+
+  .platform-cards {
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+  }
+
+  .adv-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .feature-row {
+    padding: 16px 0;
+  }
+}
+
+/* ====== RESPONSIVE LARGE TABLETS 768px+ ====== */
+@media (min-width: 768px) {
+  .container { padding: 0 24px; margin-top: -48px; }
+
+  .hero {
+    padding: 60px 40px;
+  }
+
+  .platform-card { padding: 28px; }
+  .advantages, .features { padding: 28px; }
+}
+
+/* ====== RESPONSIVE DESKTOP 1024px+ ====== */
+@media (min-width: 1024px) {
+  .container { max-width: 1100px; padding: 0 32px; margin-top: -52px; }
+
+  .hero {
+    padding: 72px 48px;
+  }
+
+  .platform-card {
+    padding: 32px;
+    transition: transform 0.25s, box-shadow 0.25s;
+  }
+
+  .platform-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.15);
+  }
+
+  .adv-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 24px;
+  }
+
+  .features {
+    padding: 32px;
+  }
+}
+
+/* ====== RESPONSIVE LARGE DESKTOP 1200px+ ====== */
+@media (min-width: 1200px) {
+  .container { max-width: 1200px; }
+
+  .hero h1 { font-size: 56px; }
+}
+
+/* ====== DARK MODE ====== */
+@media (prefers-color-scheme: dark) {
+  .adv-item .adv-icon { background: #2a2a3e; }
+  .platform-card .icon.client { background: #1a1a3e; }
+  .platform-card .icon.driver { background: #1a2e1a; }
+  .platform-card .icon.admin { background: #2e1a0a; }
+  .platform-card.client .tag { background: #1a1a3e; }
+  .platform-card.driver .tag { background: #1a2e1a; }
+  .platform-card.admin .tag { background: #2e1a0a; }
+}
+
+/* ====== PRINT ====== */
+@media print {
+  body { background: #fff; padding: 0 !important; }
+  .hero { background: #1a237e !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .platform-card, .advantages, .features { box-shadow: none; border: 1px solid #ddd; }
+  .platform-card:hover { transform: none; }
+  footer { background: #1a237e !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="badge">Plateforme Digitale</div>
+  <h1>ESODI Transport</h1>
+  <p>Gestion intelligente des transports, réservations et suivi des conducteurs au Togo</p>
+</div>
+
+<div class="container">
+
+  <div class="platform-cards">
+
+    <a href="Client.html" class="platform-card client" data-name="CLIENT">
+      <span class="tag">Public</span>
+      <div class="icon">👤</div>
+      <h3>Espace Client</h3>
+      <p>Réservez votre transport en ligne. Choisissez votre conducteur par région, ville ou quartier.</p>
+      <span class="btn-access">Accéder</span>
+    </a>
+
+    <a href="Conducteurs.html" class="platform-card driver" data-name="CONDUCTEUR">
+      <span class="tag">Authentifié</span>
+      <div class="icon">🚛</div>
+      <h3>Espace Conducteur</h3>
+      <p>Carte digitale conducteur, gestion des trajets, statistiques et export de données.</p>
+      <span class="btn-access">Accéder</span>
+    </a>
+
+    <a href="Admin.html" class="platform-card admin" data-name="ADMINISTRATEUR">
+      <span class="tag">Réservé</span>
+      <div class="icon">⚙️</div>
+      <h3>Administrateur</h3>
+      <p>Gestion des conducteurs, suivi des réservations, statistiques globales et configuration.</p>
+      <span class="btn-access">Accéder</span>
+    </a>
+
+  </div>
+
+  <h2 class="section-title">Pourquoi <span>ESODI</span> ?</h2>
+
+  <div class="advantages">
+    <div class="adv-grid">
+      <div class="adv-item">
+        <div class="adv-icon">📱</div>
+        <div>
+          <h4>Mobile Ready</h4>
+          <p>Interface adaptée à tous les écrans : smartphone, tablette et desktop.</p>
+        </div>
+      </div>
+      <div class="adv-item">
+        <div class="adv-icon">⚡</div>
+        <div>
+          <h4>Réservation Instantanée</h4>
+          <p>Les clients réservent en un clic et reçoivent une confirmation WhatsApp immédiate.</p>
+        </div>
+      </div>
+      <div class="adv-item">
+        <div class="adv-icon">🗺️</div>
+        <div>
+          <h4>Géolocalisation GPS</h4>
+          <p>Position précise du client et du conducteur avec lien Google Maps intégré.</p>
+        </div>
+      </div>
+      <div class="adv-item">
+        <div class="adv-icon">📊</div>
+        <div>
+          <h4>Statistiques Temps Réel</h4>
+          <p>Suivi des trajets, kilomètres parcourus, coûts et performance des conducteurs.</p>
+        </div>
+      </div>
+      <div class="adv-item">
+        <div class="adv-icon">🔒</div>
+        <div>
+          <h4>Sécurisé & Authentifié</h4>
+          <p>Accès conducteur protégé par mot de passe. Export JSON sécurisé des données.</p>
+        </div>
+      </div>
+      <div class="adv-item">
+        <div class="adv-icon">🌙</div>
+        <div>
+          <h4>Mode Sombre</h4>
+          <p>Design moderne avec support automatique du thème sombre pour plus de confort.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="section-title">Fonctionnalités <span>clés</span></h2>
+
+  <div class="features">
+    <div class="feature-row">
+      <span class="dot blue"></span>
+      <span class="f-text"><strong>Espace Client :</strong> Recherche de conducteurs par région, ville ou quartier <strong>(Togo)</strong>. Réservation avec GPS et envoi WhatsApp automatique.</span>
+    </div>
+    <div class="feature-row">
+      <span class="dot green"></span>
+      <span class="f-text"><strong>Espace Conducteur :</strong> Carte digitale avec photo, permis, documents. Gestion des trajets avec édition, recherche, statistiques et export JSON.</span>
+    </div>
+    <div class="feature-row">
+      <span class="dot orange"></span>
+      <span class="f-text"><strong>Administration :</strong> Gestion des conducteurs, suivi des réservations clients, vue d'ensemble de l'activité.</span>
+    </div>
+    <div class="feature-row">
+      <span class="dot blue"></span>
+      <span class="f-text"><strong>25 conducteurs</strong> répartis dans les <strong>5 régions du Togo</strong> (Maritime, Plateaux, Centrale, Kara, Savanes).</span>
+    </div>
+    <div class="feature-row">
+      <span class="dot green"></span>
+      <span class="f-text"><strong>Notifications WhatsApp</strong> vers le numéro central <strong>+228 92 87 16 05</strong> pour chaque réservation et chaque trajet.</span>
+    </div>
+    <div class="feature-row">
+      <span class="dot orange"></span>
+      <span class="f-text"><strong>Import/Export JSON</strong> des données conducteurs et trajets. Impression de la carte digitale.</span>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <p><strong>ESODI Transport</strong> — Plateforme Digitale de Gestion des Transports</p>
+  <p>Développé au Togo • 2026 • Tous droits réservés</p>
+</footer>
+
+<script>
+document.querySelectorAll('.platform-card').forEach(function(card) {
+  card.addEventListener('click', function(e) {
+    var name = this.getAttribute('data-name');
+    if (!confirm('Ouvrir l\'espace ' + name + ' ?')) {
+      e.preventDefault();
+    }
+  });
+});
+</script>
+
+</body>
+</html>
